@@ -7,10 +7,10 @@ import java.awt.*;
 
 
 // 1h30
-public class Part2 extends JFrame {
+public class Main extends JFrame {
 
 
-    public Part2() {
+    public Main() {
         setLayout(new BorderLayout());
         JTabbedPane activities = new JTabbedPane();
         add(activities, BorderLayout.CENTER);
@@ -43,6 +43,6 @@ public class Part2 extends JFrame {
     }
 
     public static void main(String[] args) {
-        Part2 app = new Part2();
+        Main app = new Main();
     }
 }
