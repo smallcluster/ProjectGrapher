@@ -130,6 +130,9 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
         float centerX = getWidth() / 2.0f + offsetX;
         float centerY = getHeight() / 2.0f + offsetY;
 
+        g.setColor(Color.white);
+        g.fillRect(0, 0, getWidth(), getHeight());
+
         g.setColor(Color.lightGray);
         g.drawLine(0, (int) centerY, getWidth(), (int) centerY);
         g.drawLine((int) centerX, 0, (int) centerX, getHeight());
@@ -144,7 +147,6 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
                 p.paint(g, centerX, centerY, zoom);
             }
         }
-
     }
 
     public void moveSelected(){
@@ -168,12 +170,16 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
         repelParticles(delta);
     }
 
+    public void updateAndDraw(){
+        update(DELTA);
+        repaint();
+    }
+
 
     @Override
     public void run() {
         while (true) {
-            update(DELTA);
-            repaint();
+            updateAndDraw();
             try {
                 Thread.sleep(16);
             } catch (InterruptedException e) {

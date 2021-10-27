@@ -76,7 +76,7 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
 
         for(int i=1; i <= ((int)centerX)/pixelsPerUnit; i++)
             g.drawLine((int) centerX-pixelsPerUnit*i, (int) centerY-halfGradSize, (int) centerX-pixelsPerUnit*i, (int) centerY+halfGradSize);
-        for(int i=1; i <= ((int)width-centerX)/pixelsPerUnit; i++)
+        for(int i=1; i <= (width-centerX)/pixelsPerUnit; i++)
             g.drawLine((int) centerX+pixelsPerUnit*i, (int) centerY-halfGradSize, (int) centerX+pixelsPerUnit*i, (int) centerY+halfGradSize);
 
         g.setColor(Color.green);
@@ -84,19 +84,24 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
 
         for(int i=1; i <= ((int) centerY)/pixelsPerUnit; i++)
             g.drawLine((int) centerX-halfGradSize, (int) centerY-pixelsPerUnit*i, (int) centerX+halfGradSize, (int) centerY-pixelsPerUnit*i);
-        for(int i=1; i <= ((int) height-centerY)/pixelsPerUnit; i++)
+        for(int i=1; i <= (height-centerY)/pixelsPerUnit; i++)
             g.drawLine((int) centerX-halfGradSize, (int) centerY+pixelsPerUnit*i, (int) centerX+halfGradSize, (int) centerY+pixelsPerUnit*i);
 
         // Draw function
-        if(!currentEval.isExpValid())
-            return;
+        if(currentEval.isExpValid())
+            drawFunction(g, centerX, centerY, pixelsPerUnit, width);
 
+        time += (float) ((System.nanoTime()-startTime)/1000000000.0);
+
+    }
+
+    public void drawFunction(Graphics g, float centerX, float centerY, float pixelsPerUnit, float width){
         g.setColor(Color.white);
 
         float d = 1.0f/ (float) (pixelsPerUnit*10.0);
-        float x = - centerX / (float) pixelsPerUnit;
+        float x = - centerX / pixelsPerUnit;
 
-        while (x <  (width-centerX) / (float) pixelsPerUnit){
+        while (x <  (width-centerX) / pixelsPerUnit){
             float y = -(currentEval.eval(x, time));
             float yy = -(currentEval.eval(x+d, time));
             g.drawLine((int) (centerX + x*pixelsPerUnit), (int)(centerY+y*pixelsPerUnit), (int)( centerX +(x+d)*pixelsPerUnit), (int) (centerY+yy*pixelsPerUnit));
@@ -104,18 +109,16 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
         }
 
         // draw mouse coords
-        float mx = (mouseX-centerX) / (float) pixelsPerUnit;
-        float my = (mouseY-centerY) / (float) pixelsPerUnit;
+        float mx = (mouseX-centerX) / pixelsPerUnit;
+        float my = (mouseY-centerY) / pixelsPerUnit;
         g.setColor(Color.cyan);
         float y = -(currentEval.eval(mx, time));
         g.drawLine((int) (centerX+mx*pixelsPerUnit), (int) centerY, (int) (centerX+mx*pixelsPerUnit), (int) (centerY+y*pixelsPerUnit));
         g.drawLine((int) centerX, (int) (centerY+y*pixelsPerUnit), (int) (centerX+mx*pixelsPerUnit), (int) (centerY+y*pixelsPerUnit));
 
         g.drawString("("+mx+", "+y+")", (int) (centerX+mx*pixelsPerUnit)+32, (int)(centerY+my*pixelsPerUnit)+32);
-
-        double delta = (System.nanoTime()-startTime)/1000000000.0;
-        time += (float) delta;
     }
+
 
     public void recenter(){
         offsetY = 0;
@@ -173,6 +176,9 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
     public void run() {
         while (true) {
             repaint();
+            try {
+                Thread.sleep(16);
+            } catch (InterruptedException e) {}
         }
     }
 
