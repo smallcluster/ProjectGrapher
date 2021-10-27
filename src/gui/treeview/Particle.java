@@ -54,6 +54,7 @@ public class Particle {
         int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
         g.setFont(font);
         g.drawString(name, (int) (x*zoom+offsetX-tw/2.0), (int) (y*zoom+offsetY+th/2.0));
+
     }
 
     public void update(float delta){

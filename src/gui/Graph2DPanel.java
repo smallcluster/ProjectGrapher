@@ -44,79 +44,93 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
 
         int width = getWidth();
         int height = getHeight();
-
         float centerX = width/2.0f + offsetX;
         float centerY = height/2.0f + offsetY;
+        float pixelsPerUnit = (fixedPixelsPerUnit*zoom);
 
-        int pixelsPerUnit = (int) (fixedPixelsPerUnit*zoom);
-        int halfGradSize = pixelsPerUnit/4;
-
-        g.setColor(Color.black);
+        // background
+        g.setColor(Color.white);
         g.fillRect(0,0, width, height);
 
-        // Draw grid
-        g.setColor(Color.getHSBColor(0, 0, 0.1f));
-
-        // vertical
-        for(int i=1; i <= ((int)centerX)/(pixelsPerUnit/2); i++)
-            g.drawLine((int) centerX-(pixelsPerUnit/2)*i, 0, (int) centerX-(pixelsPerUnit/2)*i, height);
-        for(int i=1; i <= 2*(width-centerX)/pixelsPerUnit; i++)
-            g.drawLine((int) centerX+(pixelsPerUnit/2)*i, 0, (int) centerX+(pixelsPerUnit/2)*i, height);
-
-        // horizontal
-        for(int i=1; i <= ((int) centerY)/(pixelsPerUnit/2); i++)
-            g.drawLine(0, (int) centerY-(pixelsPerUnit/2)*i, width, (int) centerY-(pixelsPerUnit/2)*i);
-        for(int i=1; i <= 2*(height-centerY)/(pixelsPerUnit); i++)
-            g.drawLine(0, (int) centerY+(pixelsPerUnit/2)*i, width, (int) centerY+(pixelsPerUnit/2)*i);
-
-
-        // draw Axes
-        g.setColor(Color.red);
-        g.drawLine(0, (int) centerY, width , (int) centerY);
-
-        for(int i=1; i <= ((int)centerX)/pixelsPerUnit; i++)
-            g.drawLine((int) centerX-pixelsPerUnit*i, (int) centerY-halfGradSize, (int) centerX-pixelsPerUnit*i, (int) centerY+halfGradSize);
-        for(int i=1; i <= (width-centerX)/pixelsPerUnit; i++)
-            g.drawLine((int) centerX+pixelsPerUnit*i, (int) centerY-halfGradSize, (int) centerX+pixelsPerUnit*i, (int) centerY+halfGradSize);
-
-        g.setColor(Color.green);
-        g.drawLine((int) centerX, 0, (int) centerX , height);
-
-        for(int i=1; i <= ((int) centerY)/pixelsPerUnit; i++)
-            g.drawLine((int) centerX-halfGradSize, (int) centerY-pixelsPerUnit*i, (int) centerX+halfGradSize, (int) centerY-pixelsPerUnit*i);
-        for(int i=1; i <= (height-centerY)/pixelsPerUnit; i++)
-            g.drawLine((int) centerX-halfGradSize, (int) centerY+pixelsPerUnit*i, (int) centerX+halfGradSize, (int) centerY+pixelsPerUnit*i);
+        drawGrid(g, centerX, centerY, pixelsPerUnit, width, height);
+        drawAxes(g, centerX, centerY, pixelsPerUnit, width, height);
 
         // Draw function
         if(currentEval.isExpValid())
             drawFunction(g, centerX, centerY, pixelsPerUnit, width);
 
-        time += (float) ((System.nanoTime()-startTime)/1000000000.0);
+        time += (float) ((System.nanoTime()-startTime)/1000000000.0)+0.016f;
 
     }
 
-    public void drawFunction(Graphics g, float centerX, float centerY, float pixelsPerUnit, float width){
-        g.setColor(Color.white);
+    private void drawAxes(Graphics g, float centerX, float centerY, float pixelsPerUnit, int width, int height){
 
-        float d = 1.0f/ (float) (pixelsPerUnit*10.0);
+        Graphics2D g2 = (Graphics2D) g.create();
+
+        g2.setStroke(new BasicStroke(2));
+
+        float halfGradSize = pixelsPerUnit/4;
+        g2.setColor(Color.black);
+        // X axis
+        g2.drawLine(0, (int) centerY, width , (int) centerY);
+        for(int i=1; i <= centerX/pixelsPerUnit; i++)
+            g2.drawLine((int) (centerX-pixelsPerUnit*i), (int) (centerY-halfGradSize), (int) (centerX-pixelsPerUnit*i), (int) (centerY+halfGradSize));
+        for(int i=1; i <= (width-centerX)/pixelsPerUnit; i++)
+            g2.drawLine((int) (centerX+pixelsPerUnit*i), (int) (centerY-halfGradSize), (int) (centerX+pixelsPerUnit*i), (int) (centerY+halfGradSize));
+
+        // Y axis
+        g2.drawLine((int) centerX, 0, (int) centerX , height);
+        for(int i=1; i <= centerY/pixelsPerUnit; i++)
+            g2.drawLine((int) (centerX-halfGradSize), (int) (centerY-pixelsPerUnit*i), (int) (centerX+halfGradSize), (int) (centerY-pixelsPerUnit*i));
+        for(int i=1; i <= (height-centerY)/pixelsPerUnit; i++)
+            g2.drawLine((int) (centerX-halfGradSize), (int) (centerY+pixelsPerUnit*i), (int) (centerX+halfGradSize), (int) (centerY+pixelsPerUnit*i));
+
+        g2.dispose();
+    }
+
+    private void drawGrid(Graphics g, float centerX, float centerY, float pixelsPerUnit, int width, int height){
+        g.setColor(Color.getHSBColor(0, 0, 0.8f));
+        // vertical
+        for(int i=1; i <= (centerX/pixelsPerUnit); i++)
+            g.drawLine((int) (centerX-pixelsPerUnit*i), 0, (int) (centerX-pixelsPerUnit*i), height);
+        for(int i=1; i <= (width-centerX)/pixelsPerUnit; i++)
+            g.drawLine((int) (centerX+pixelsPerUnit*i), 0, (int) (centerX+pixelsPerUnit*i), height);
+
+        // horizontal
+        for(int i=1; i <= (int) (centerY/pixelsPerUnit); i++)
+            g.drawLine(0, (int) (centerY-pixelsPerUnit*i), width, (int) (centerY-pixelsPerUnit*i));
+        for(int i=1; i <= (height-centerY)/pixelsPerUnit; i++)
+            g.drawLine(0, (int) (centerY+pixelsPerUnit*i), width, (int) (centerY+pixelsPerUnit*i));
+    }
+
+    public void drawFunction(Graphics g, float centerX, float centerY, float pixelsPerUnit, float width){
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        g2.setColor(Color.red);
+        g2.setStroke(new BasicStroke(2));
+        float d = 1.0f/ (pixelsPerUnit);
         float x = - centerX / pixelsPerUnit;
 
         while (x <  (width-centerX) / pixelsPerUnit){
             float y = -(currentEval.eval(x, time));
             float yy = -(currentEval.eval(x+d, time));
-            g.drawLine((int) (centerX + x*pixelsPerUnit), (int)(centerY+y*pixelsPerUnit), (int)( centerX +(x+d)*pixelsPerUnit), (int) (centerY+yy*pixelsPerUnit));
+            g2.drawLine((int) (centerX + x*pixelsPerUnit), (int)(centerY+y*pixelsPerUnit), (int)( centerX +(x+d)*pixelsPerUnit), (int) (centerY+yy*pixelsPerUnit));
             x += d;
         }
 
         // draw mouse coords
         float mx = (mouseX-centerX) / pixelsPerUnit;
         float my = (mouseY-centerY) / pixelsPerUnit;
-        g.setColor(Color.cyan);
+        g2.setColor(Color.BLUE);
+        g2.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
         float y = -(currentEval.eval(mx, time));
-        g.drawLine((int) (centerX+mx*pixelsPerUnit), (int) centerY, (int) (centerX+mx*pixelsPerUnit), (int) (centerY+y*pixelsPerUnit));
-        g.drawLine((int) centerX, (int) (centerY+y*pixelsPerUnit), (int) (centerX+mx*pixelsPerUnit), (int) (centerY+y*pixelsPerUnit));
+        g2.drawLine((int) (centerX+mx*pixelsPerUnit), (int) centerY, (int) (centerX+mx*pixelsPerUnit), (int) (centerY+y*pixelsPerUnit));
+        g2.drawLine((int) centerX, (int) (centerY+y*pixelsPerUnit), (int) (centerX+mx*pixelsPerUnit), (int) (centerY+y*pixelsPerUnit));
+        g2.drawString("("+mx+", "+y+")", (int) (centerX+mx*pixelsPerUnit)+32, (int)(centerY+my*pixelsPerUnit)+32);
 
-        g.drawString("("+mx+", "+y+")", (int) (centerX+mx*pixelsPerUnit)+32, (int)(centerY+my*pixelsPerUnit)+32);
+        g2.dispose();
     }
 
 
