@@ -13,14 +13,14 @@ public class GraphControl extends JPanel {
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
         add(container);
 
-        InputField xmin = new InputField("x min", "-10");
-        container.add(xmin);
-        InputField xmax = new InputField("x max", "10");
-        container.add(xmax);
-        InputField ymin = new InputField("y min", "-10");
-        container.add(ymin);
-        InputField ymax = new InputField("y max", "10");
-        container.add(ymax);
+//        InputField xmin = new InputField("x min", "-10");
+//        container.add(xmin);
+//        InputField xmax = new InputField("x max", "10");
+//        container.add(xmax);
+//        InputField ymin = new InputField("y min", "-10");
+//        container.add(ymin);
+//        InputField ymax = new InputField("y max", "10");
+//        container.add(ymax);
 
         JButton recenter = new JButton("Recenter");
         container.add(recenter);
