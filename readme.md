@@ -2,4 +2,4 @@
 
 ## About
 
-A simple function graphing tool written in Java.
+A simple function plotting tool written in Java.
