@@ -28,6 +28,7 @@ public class Main extends JFrame {
         // Graph controls
         GraphControl graphControl = new GraphControl(graph2DPanel);
         graphActivity2D.add(graphControl, BorderLayout.WEST);
+
         activities.addTab("2D Graph", graphActivity2D);
         graph2DPanel.restart(); // at first we are on the graph2DPanel
 

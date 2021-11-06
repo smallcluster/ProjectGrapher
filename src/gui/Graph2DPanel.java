@@ -3,22 +3,73 @@ package gui;
 import eval.Evaluator;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 
 public class Graph2DPanel extends Animated2DView implements MouseListener {
 
     private Evaluator currentEval;
+    private GraphControl graphControl = null;
 
+    // Axis selection
     private boolean scalingAxisX = false;
     private boolean scalingAxisY = false;
+
+    // ------------------ Controls -----------------------
+    private float step = 0.01f;
+    private boolean autoStep = true;
+
+    //  SETTERS
+    public void setAutoStep(boolean b){
+        autoStep = b;
+        updateAutoStep();
+    }
+    public void setStep(float v){
+        if(!autoStep)
+            step = v;
+    }
+    public void setRegion(float minx, float maxx, float miny, float maxy){
+        setPixelsPerUnitX(getWidth() / (maxx - minx));
+        offsetX = -getPixelsPerUnitX()*(maxx+minx)/2.0f;
+        setPixelsPerUnitY(getHeight() / (maxy - miny));
+        offsetY = getPixelsPerUnitY()*(maxy+miny)/2.0f;
+        updateAutoStep();
+    }
+
+    public void setGraphControl(GraphControl graphControl){
+        this.graphControl = graphControl;
+    }
+    // UPDATE CONTROLS PANEL
+    public void updateAutoStep(){
+        if(autoStep){
+            step = 1.0f / getPixelsPerUnitX();
+            if(graphControl != null)
+                graphControl.setStep(step);
+        }
+    }
+
+    // set view bounds in world coordinates
+    private void updateRegion(){
+        if(graphControl == null)
+            return;
+        graphControl.setRegion(getWorldX(0), getWorldX(getWidth()), getWorldY(getHeight()), getWorldY(0));
+    }
 
     public Graph2DPanel(int w, int h, Evaluator evaluator) {
         super();
         setPreferredSize(new Dimension(w, h));
         currentEval = evaluator;
+
         addMouseListener(this);
+        // Detect resize change
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                updateRegion();
+            }
+        });
     }
+
 
     @Override
     public void paint(Graphics g) {
@@ -29,15 +80,15 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         drawGrid(g);
         drawAxes(g);
         //Draw function
-        if (currentEval.isExpValid())
+        if (currentEval.isExpValid()){
             drawFunction(g);
+        }
         // Draw fps
         drawFps(g);
     }
 
     @Override
-    public void updateLogic() {
-    }
+    public void updateLogic() {}
 
     private void drawAxes(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
@@ -47,7 +98,9 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         float halfGradSizeY = getPixelsPerUnitY() / 4;
 
         // X axis
-        if((getScreenY(0)-5 < prevMouseY && getScreenY(0)+5 > prevMouseY) || scalingAxisX)
+        if(scalingAxisX)
+            g2.setColor(Color.BLUE);
+        else if((getScreenY(0)-5 < prevMouseY && getScreenY(0)+5 > prevMouseY))
             g2.setColor(Color.ORANGE);
         else
             g2.setColor(Color.black);
@@ -57,7 +110,9 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
             g2.drawLine((int) getScreenX(x), (int) (getScreenY(0) - halfGradSizeX), (int) getScreenX(x), (int) (getScreenY(0) + halfGradSizeX));
 
         // Y axis
-        if((getScreenX(0)-5 < prevMouseX && getScreenX(0)+5 > prevMouseX) || scalingAxisY)
+        if(scalingAxisY)
+            g2.setColor(Color.BLUE);
+        else if((getScreenX(0)-5 < prevMouseX && getScreenX(0)+5 > prevMouseX))
             g2.setColor(Color.ORANGE);
         else
             g2.setColor(Color.black);
@@ -84,17 +139,16 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         g2.setColor(Color.red);
         g2.setStroke(new BasicStroke(2));
 
-        float d = 1.0f / getPixelsPerUnitX();
-
         int height = getHeight();
         float endX = getWorldX(getWidth());
-        for (float x = getWorldX(0); x < endX; x += d) {
+
+        for (float x = getWorldX(0); x < endX; x += step) {
             float y = getScreenY(currentEval.eval(x, time));
-            float yy = getScreenY(currentEval.eval(x + d, time));
+            float yy = getScreenY(currentEval.eval(x + step, time));
 
             // draw line only if visible
             if ((y > 0 && y < height) || (yy > 0 && yy < height))
-                g2.drawLine((int) getScreenX(x), (int) y, (int) getScreenX(x + d), (int) yy);
+                g2.drawLine((int) getScreenX(x), (int) y, (int) getScreenX(x + step), (int) yy);
         }
 
         // draw mouse coords
@@ -143,9 +197,9 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     public void mouseDragged(MouseEvent e) {
         if (!scalingAxisX && !scalingAxisY) {
             super.mouseDragged(e);
+            updateRegion();
             return;
         }
-
         // update base pixels per unit
         if(scalingAxisX && scalingAxisY){
             float dx = (getWorldX(e.getX())-getWorldX(prevMouseX))*getPixelsPerUnitX();
@@ -153,7 +207,6 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
             setPixelsPerUnitY(getPixelsPerUnitY()+dx);
         } else if(scalingAxisX){
             float x = getWorldX(prevMouseX);
-
             if( x < 0.001 && x > -0.001){
                 float dx = (getWorldX(e.getX())-getWorldX(prevMouseX))*getPixelsPerUnitX();
                 setPixelsPerUnitX(getPixelsPerUnitX()+dx);
@@ -161,7 +214,6 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
                 float ratio = getWorldX(e.getX())/getWorldX(prevMouseX);
                 setPixelsPerUnitX(getPixelsPerUnitX()*ratio);
             }
-
         } else {
             float y = getWorldY(prevMouseY);
             if( y < 0.001 && y > -0.001){
@@ -180,6 +232,15 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
 
         prevMouseX = e.getX();
         prevMouseY = e.getY();
+        updateRegion();
+        updateAutoStep();
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e){
+        super.mouseWheelMoved(e);
+        updateRegion();
+        updateAutoStep();
     }
 
     @Override
@@ -187,4 +248,5 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {}
+
 }
