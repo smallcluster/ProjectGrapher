@@ -16,9 +16,9 @@ public class TreeControl extends JPanel {
         container.add(recenter);
         recenter.addActionListener(e -> treePanel.recenter());
 
-        JButton redeplier = new JButton("Re-unfold");
-        container.add(redeplier);
-        redeplier.addActionListener(e -> treePanel.recrush());
+        JButton reunfold = new JButton("Re-unfold");
+        container.add(reunfold);
+        reunfold.addActionListener(e -> treePanel.recrush());
 
 
     }
