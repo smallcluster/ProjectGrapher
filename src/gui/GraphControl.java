@@ -32,13 +32,13 @@ public class GraphControl extends JPanel {
         autoStep = new JCheckBox("auto step");
         autoStep.setSelected(true);
         add(5, autoStep, 0);
-
         JButton recenter = new JButton("Recenter view");
         add(6, recenter, 1);
 
         recenter.addActionListener(e -> graph2DPanel.recenter());
 
         autoStep.addActionListener(e -> graph2DPanel.setAutoStep(autoStep.isSelected()));
+
 
         step.addDocumentListener(new DocumentListener() {
             @Override

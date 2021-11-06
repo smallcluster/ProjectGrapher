@@ -225,10 +225,10 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
             }
         }
 
-        if(getPixelsPerUnitX() < 1)
-            setPixelsPerUnitX(1);
-        if(getPixelsPerUnitY() < 1)
-            setPixelsPerUnitY(1);
+        if(getPixelsPerUnitX() < 2)
+            setPixelsPerUnitX(2);
+        if(getPixelsPerUnitY() < 2)
+            setPixelsPerUnitY(2);
 
         prevMouseX = e.getX();
         prevMouseY = e.getY();

@@ -160,10 +160,10 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
         pixelsPerUnitX -= pixelsPerUnitX *e.getWheelRotation()/10.0f;
         pixelsPerUnitY -= pixelsPerUnitY *e.getWheelRotation()/10.0f;
 
-        if(pixelsPerUnitX < 1)
-            pixelsPerUnitX = 1;
-        if(pixelsPerUnitY < 1)
-            pixelsPerUnitY = 1;
+        if(pixelsPerUnitX < 2)
+            pixelsPerUnitX = 2;
+        if(pixelsPerUnitY < 2)
+            pixelsPerUnitY = 2;
 
         float newmx = getWorldX(e.getX());
         float newmy = getWorldY(e.getY());
