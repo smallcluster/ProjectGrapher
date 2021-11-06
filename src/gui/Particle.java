@@ -1,4 +1,4 @@
-package gui.treeview;
+package gui;
 
 import java.awt.*;
 
@@ -31,6 +31,10 @@ public class Particle {
 
     public boolean isFixed(){
         return isFixed || isRoot;
+    }
+
+    public boolean isRoot(){
+        return isRoot;
     }
 
     public void setFixed(boolean fixed){
@@ -68,15 +72,7 @@ public class Particle {
         y += dy;
     }
 
-    public void impulseRepel(Particle other, float delta){
-        if(isFixed() && other.isFixed())
-            return;
-        float dd = (other.x - x) * (other.x - x) + (other.y - y) * (other.y - y);
-        if (dd == 0)
-            dd = 0.1f; // to prevent division by zero
-        float fx = delta*70000 * (other.x - x) /dd;
-        float fy = delta*70000 * (other.y - y) /dd;
-
+    private void applyForces(Particle other, float fx, float fy){
         if (isFixed()) {
             other.x += fx;
             other.y += fy;
@@ -92,6 +88,19 @@ public class Particle {
             y -= fy;
         }
     }
+
+    public void repel(Particle other, float delta){
+        if(isFixed() && other.isFixed())
+            return;
+        float dd = (other.x - x) * (other.x - x) + (other.y - y) * (other.y - y);
+        if (dd == 0)
+            dd = 0.1f; // to prevent division by zero
+        float fx = delta*70000 * (other.x - x) /dd;
+        float fy = delta*70000 * (other.y - y) /dd;
+
+        applyForces(other, fx, fy);
+    }
+
     public void staticCollision(Particle other){
         if(isFixed() && other.isFixed())
             return;
@@ -103,20 +112,7 @@ public class Particle {
             float diff = r+ other.r-d;
             float fx = diff * (other.x - x) /d;
             float fy = diff * (other.y - y) /d;
-            if (isFixed()) {
-                other.x += fx;
-                other.y += fy;
-            } else if (other.isFixed()) {
-                x -= fx;
-                y -= fy;
-            } else {
-                fx /= 2.0f;
-                fy /= 2.0f;
-                other.x += fx;
-                other.y += fy;
-                x -= fx;
-                y -= fy;
-            }
+            applyForces(other, fx, fy);
         }
     }
 }

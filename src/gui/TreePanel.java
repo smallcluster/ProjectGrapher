@@ -1,4 +1,4 @@
-package gui.treeview;
+package gui;
 
 import eval.Evaluator;
 import eval.tree.Node;
@@ -7,9 +7,12 @@ import eval.tree.TestIF;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-public class TreeView extends JPanel implements Runnable, MouseMotionListener, MouseWheelListener, MouseListener {
+import static javax.swing.SwingUtilities.invokeAndWait;
+
+public class TreePanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener {
 
     private final Evaluator evaluator;
     private final float DELTA = 1.0f / 60.0f;
@@ -20,16 +23,47 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
     private float zoom = 0.5f;
     private final ArrayList<Particle> particles = new ArrayList<>();
     private final ArrayList<Link> links = new ArrayList<>();
+    private int fps = 60;
 
     private Particle selected = null;
 
-    public TreeView(Evaluator evaluator) {
-        super();
+    final Runnable refresh = new Runnable() {
+        @Override
+        public void run() {
+            update(DELTA);
+            repaint();
+        }
+    };
+
+    public TreePanel(Evaluator evaluator) {
         this.evaluator = evaluator;
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addMouseListener(this);
-        Thread drawingThread = new Thread(this);
+        Thread drawingThread = new Thread(){
+            public void run(){
+                while (true){
+                    long startTime = System.nanoTime();
+                    try {
+                        invokeAndWait(refresh);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                    double delta = ((System.nanoTime()-startTime)/1000000000.0);
+                    double remainingTime = Math.max(1.0/60.0 - delta, 0);
+                    long sleepTime = (int) (remainingTime*1000.0);
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    delta = ((System.nanoTime()-startTime)/1000000000.0);
+                    fps = (int) (1.0/delta);
+                }
+            }
+        };
         drawingThread.setDaemon(true);
         drawingThread.start();
     }
@@ -54,7 +88,7 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
                 for (int j = i+1; j < particles.size(); j++) {
                     Particle p1 = particles.get(i);
                     Particle p2 = particles.get(j);
-                    p1.impulseRepel(p2, delta);
+                    p1.repel(p2, delta);
                 }
             }
         }
@@ -82,7 +116,7 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
             p = new Particle(tree.getName(), 0, 0, 32);
             p.markAsRoot();
         } else {
-            p = new Particle(tree.getName(), (float) (2 * Math.random() - 1) * 64.0f, (float) (2 * Math.random() - 1) * 64.0f, 32);
+            p = new Particle(tree.getName(), (float) (2 * Math.random() - 1) * 64.0f,(float) (2 * Math.random() - 1) * 64.0f, 32);
         }
         Node left = tree.getLeft();
         Node right = tree.getRight();
@@ -123,6 +157,25 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
         return p;
     }
 
+    public void recrush(){
+        synchronized (particles){
+            for (Particle p : particles) {
+                if(p.isRoot()){
+                    p.x = 0;
+                    p.y = 0;
+                    p.oldy = 0;
+                    p.oldx = 0;
+                } else {
+                    p.x = (float) (2 * Math.random() - 1) * 64.0f;
+                    p.y = (float) (2 * Math.random() - 1) * 64.0f;
+                    p.oldx = p.x;
+                    p.oldy = p.y;
+                    p.setFixed(false);
+                }
+            }
+        }
+    }
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -147,6 +200,22 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
                 p.paint(g, centerX, centerY, zoom);
             }
         }
+
+        // Draw fps
+        drawFps(g);
+    }
+
+    private void drawFps(Graphics g){
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        Font font = new Font("TimesRoman", Font.BOLD, 16);
+        FontMetrics metrics = g2.getFontMetrics(font);
+        String fpsinfo = fps+" FPS";
+        int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
+        g2.setColor(Color.black);
+        g2.setFont(font);
+        g2.drawString(fpsinfo, 4, th*2);
+        g2.dispose();
     }
 
     public void moveSelected(){
@@ -170,21 +239,9 @@ public class TreeView extends JPanel implements Runnable, MouseMotionListener, M
         repelParticles(delta);
     }
 
-    public void updateAndDraw(){
-        update(DELTA);
-        repaint();
-    }
-
-
-    @Override
-    public void run() {
-        while (true) {
-            updateAndDraw();
-            try {
-                Thread.sleep(16);
-            } catch (InterruptedException e) {
-            }
-        }
+    public void recenter(){
+        offsetY = 0;
+        offsetX = 0;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package gui;
 
 import eval.Evaluator;
-import gui.treeview.TreeView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +8,7 @@ import java.awt.event.ActionListener;
 
 public class FuncInputField extends JPanel {
 
-    public FuncInputField(Graph2DPanel graph2DPanel, Evaluator evaluator, String expText, TreeView treeView){
+    public FuncInputField(Graph2DPanel graph2DPanel, Evaluator evaluator, String expText, TreePanel treePanel){
 
         setLayout(new BorderLayout());
 
@@ -55,7 +54,7 @@ public class FuncInputField extends JPanel {
                 inputField.setForeground(Color.black);
                 errorLog.setVisible(false);
                 graph2DPanel.repaint();
-                treeView.buildParticleSim();
+                treePanel.buildParticleSim();
             }
         };
 

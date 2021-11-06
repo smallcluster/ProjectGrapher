@@ -8,10 +8,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.lang.reflect.InvocationTargetException;
 
+import static javax.swing.SwingUtilities.invokeAndWait;
 
-// TODO : fix viewport interval
-public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWheelListener, Runnable {
+public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWheelListener {
 
     private float mouseX = 0;
     private float mouseY = 0;
@@ -20,8 +21,18 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
     private float zoom = 1.0f;
     private float fixedPixelsPerUnit = 64;
     private float time = 0.0f;
+    private int fps = 60;
 
     private Evaluator currentEval;
+
+
+    final Runnable refresh = new Runnable() {
+        @Override
+        public void run() {
+            repaint();
+        }
+    };
+
 
     public Graph2DPanel(int w, int h, Evaluator evaluator){
         setPreferredSize(new Dimension(w,h));
@@ -29,18 +40,38 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
         addMouseWheelListener(this);
         currentEval = evaluator;
 
-        Thread anim = new Thread(this);
+        Thread anim = new Thread() {
+            public void run(){
+                while (true){
+                    long startTime = System.nanoTime();
+                    try {
+                        invokeAndWait(refresh);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                    double delta = ((System.nanoTime()-startTime)/1000000000.0);
+                    double remainingTime = Math.max(1.0/60.0 - delta, 0);
+                    long sleepTime = (int) (remainingTime*1000.0);
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    delta = ((System.nanoTime()-startTime)/1000000000.0);
+                    fps = (int) (1.0/delta);
+                    time += (float) delta;
+                }
+            }
+        };
         anim.setDaemon(true);
         anim.start();
     }
 
-    // TODO : Draw only the visible part !
-
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-
-        long startTime = System.nanoTime();
 
         int width = getWidth();
         int height = getHeight();
@@ -59,8 +90,21 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
         if(currentEval.isExpValid())
             drawFunction(g, centerX, centerY, pixelsPerUnit, width);
 
-        time += (float) ((System.nanoTime()-startTime)/1000000000.0)+0.016f;
+        // Draw fps
+        drawFps(g);
+    }
 
+    private void drawFps(Graphics g){
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        Font font = new Font("TimesRoman", Font.BOLD, 16);
+        FontMetrics metrics = g2.getFontMetrics(font);
+        String fpsinfo = fps+" FPS";
+        int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
+        g2.setColor(Color.black);
+        g2.setFont(font);
+        g2.drawString(fpsinfo, 4, th*2);
+        g2.dispose();
     }
 
     private void drawAxes(Graphics g, float centerX, float centerY, float pixelsPerUnit, int width, int height){
@@ -128,7 +172,7 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
         float y = -(currentEval.eval(mx, time));
         g2.drawLine((int) (centerX+mx*pixelsPerUnit), (int) centerY, (int) (centerX+mx*pixelsPerUnit), (int) (centerY+y*pixelsPerUnit));
         g2.drawLine((int) centerX, (int) (centerY+y*pixelsPerUnit), (int) (centerX+mx*pixelsPerUnit), (int) (centerY+y*pixelsPerUnit));
-        g2.drawString("("+mx+", "+y+")", (int) (centerX+mx*pixelsPerUnit)+32, (int)(centerY+my*pixelsPerUnit)+32);
+        g2.drawString("("+mx+", "+(-y)+")", (int) (centerX+mx*pixelsPerUnit)+32, (int)(centerY+my*pixelsPerUnit)+32);
 
         g2.dispose();
     }
@@ -137,7 +181,6 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
     public void recenter(){
         offsetY = 0;
         offsetX = 0;
-        //repaint();
     }
 
     @Override
@@ -148,14 +191,12 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
         mouseY = e.getY();
         offsetX += mouseX-mx;
         offsetY += mouseY-my;
-        //repaint();
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
         mouseX = e.getX();
         mouseY = e.getY();
-        //repaint();
     }
 
 
@@ -182,18 +223,5 @@ public class Graph2DPanel extends JPanel implements MouseMotionListener, MouseWh
 
         offsetX += (newmx-mx)*newPixelsPerUnit;
         offsetY += (newmy-my)*newPixelsPerUnit;
-
-        //repaint();
     }
-
-    @Override
-    public void run() {
-        while (true) {
-            repaint();
-            try {
-                Thread.sleep(16);
-            } catch (InterruptedException e) {}
-        }
-    }
-
 }

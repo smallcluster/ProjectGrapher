@@ -1,4 +1,4 @@
-package gui.treeview;
+package gui;
 
 import java.awt.*;
 
