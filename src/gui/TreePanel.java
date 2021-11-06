@@ -158,6 +158,11 @@ public class TreePanel extends Animated2DView implements MouseListener {
 
     private void drawParticles(Graphics g) {
         for (Particle p : particles) {
+
+            // do not draw particle if not visible
+            if(!particleIsVisible(p))
+                continue;
+
             if (p.isRoot())
                 g.setColor(Color.red);
             else if (p.isFixed())
@@ -178,8 +183,18 @@ public class TreePanel extends Animated2DView implements MouseListener {
         }
     }
 
+    private boolean particleIsVisible(Particle p){
+        return !(getScreenX(p.x)+p.r*getPixelsPerUnit() < 0 || getScreenX(p.x)-p.r*getPixelsPerUnit() > getWidth()
+                || getScreenY(p.y)+p.r*getPixelsPerUnit() < 0 || getScreenY(p.y)-p.r*getPixelsPerUnit() > getHeight());
+    }
+
     private void drawLinks(Graphics g) {
         for (Link li : links) {
+
+            // do not draw link if not visible
+            if(!particleIsVisible(li.getP1()) && !particleIsVisible(li.getP2()))
+                continue;
+
             String info = "";
             switch (li.getType()) {
                 case NORMAL:
