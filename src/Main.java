@@ -18,15 +18,16 @@ public class Main extends JFrame {
         Evaluator evaluator = new Evaluator();
 
         // ------------ GRAPH TAB ----------------------------
-        JPanel GraphActivity2D = new JPanel();
-        GraphActivity2D.setLayout(new BorderLayout());
+        JPanel graphActivity2D = new JPanel();
+        graphActivity2D.setLayout(new BorderLayout());
         // Graph view
         Graph2DPanel graph2DPanel = new Graph2DPanel(1280, 720, evaluator);
-        GraphActivity2D.add(graph2DPanel, BorderLayout.CENTER);
+        graphActivity2D.add(graph2DPanel, BorderLayout.CENTER);
         // Graph controls
         GraphControl graphControl = new GraphControl(graph2DPanel);
-        GraphActivity2D.add(graphControl, BorderLayout.WEST);
-        activities.addTab("2D Graph", GraphActivity2D);
+        graphActivity2D.add(graphControl, BorderLayout.WEST);
+        activities.addTab("2D Graph", graphActivity2D);
+        graph2DPanel.restart(60);
 
         // -------------- TREE TAB ---------------------------
         JPanel TreeActivity2D = new JPanel();
