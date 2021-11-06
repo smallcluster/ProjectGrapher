@@ -15,8 +15,10 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
     protected float prevMouseY = 0;
     protected int fps = 60;
     protected float time = 0.0f;
-    protected float basePixelsPerUnit = 64.0f;
-    protected float zoom = 1.0f;
+
+    private float pixelsPerUnitX = 64.0f;
+    private float pixelsPerUnitY = 64.0f;
+
     protected int frameCap = 60;
 
 
@@ -81,25 +83,42 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
 
 
     public float getScreenX(float x){
-        return x*getPixelsPerUnit() +0.5f*getWidth()+offsetX;
+        return x*getPixelsPerUnitX() +0.5f*getWidth()+offsetX;
     }
 
     public float getScreenY(float y){
-        return -y*getPixelsPerUnit() +0.5f*getHeight()+offsetY;
+        return -y*getPixelsPerUnitY() +0.5f*getHeight()+offsetY;
     }
 
     public float getWorldX(float x){
-        return (x-offsetX-0.5f*getWidth())/getPixelsPerUnit();
+        return (x-offsetX-0.5f*getWidth())/getPixelsPerUnitX();
     }
 
     public float getWorldY(float y){
-        return -(y-offsetY-0.5f*getHeight())/getPixelsPerUnit();
+        return -(y-offsetY-0.5f*getHeight())/getPixelsPerUnitY();
     }
 
-    public float getPixelsPerUnit(){
-        return basePixelsPerUnit *zoom;
+
+    public float getPixelsPerUnitX(){
+        return pixelsPerUnitX;
     }
 
+    public float getPixelsPerUnitY(){
+        return pixelsPerUnitY;
+    }
+
+    public void setPixelsPerUnit(float v){
+        pixelsPerUnitX = v;
+        pixelsPerUnitY = v;
+    }
+
+    public void setPixelsPerUnitX(float v){
+        pixelsPerUnitX = v;
+    }
+
+    public void setPixelsPerUnitY(float v){
+        pixelsPerUnitY = v;
+    }
 
     public void drawFps(Graphics g){
         Graphics2D g2 = (Graphics2D) g.create();
@@ -138,11 +157,13 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
         float mx = getWorldX(e.getX());
         float my = getWorldY(e.getY());
 
-        zoom -= zoom*e.getWheelRotation()/10.0f;
-        if(zoom <= 0.1f)
-            zoom = 0.1f;
-        else if(zoom >= 100.0f)
-            zoom = 100.0f;
+        pixelsPerUnitX -= pixelsPerUnitX *e.getWheelRotation()/10.0f;
+        pixelsPerUnitY -= pixelsPerUnitY *e.getWheelRotation()/10.0f;
+
+        if(pixelsPerUnitX < 1)
+            pixelsPerUnitX = 1;
+        if(pixelsPerUnitY < 1)
+            pixelsPerUnitY = 1;
 
         float newmx = getWorldX(e.getX());
         float newmy = getWorldY(e.getY());

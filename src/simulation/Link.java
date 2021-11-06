@@ -1,4 +1,4 @@
-package gui;
+package simulation;
 
 public class Link {
 
@@ -6,7 +6,7 @@ public class Link {
     private final Particle p2;
     private final float restLength;
 
-    enum Type {
+    public enum Type {
         NORMAL,
         COND,
         TRUE,

@@ -3,6 +3,8 @@ package gui;
 import eval.Evaluator;
 import eval.tree.Node;
 import eval.tree.TestIF;
+import simulation.Link;
+import simulation.Particle;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -18,9 +20,10 @@ public class TreePanel extends Animated2DView implements MouseListener {
     private Particle selected = null;
 
     public TreePanel(Evaluator evaluator) {
+        super();
         this.evaluator = evaluator;
         addMouseListener(this);
-        basePixelsPerUnit = 32.0f;
+        setPixelsPerUnit(32.0f);
     }
 
     public void buildParticleSim() {
@@ -160,7 +163,7 @@ public class TreePanel extends Animated2DView implements MouseListener {
         for (Particle p : particles) {
 
             // do not draw particle if not visible
-            if(!particleIsVisible(p))
+            if(particleNotVisible(p))
                 continue;
 
             if (p.isRoot())
@@ -169,12 +172,12 @@ public class TreePanel extends Animated2DView implements MouseListener {
                 g.setColor(Color.blue);
             else
                 g.setColor(Color.black);
-            g.fillOval((int) (getScreenX(p.x) - p.r * getPixelsPerUnit()),
-                    (int) (getScreenY(p.y) - p.r * getPixelsPerUnit()),
-                    (int) (p.r * 2 * getPixelsPerUnit()),
-                    (int) (p.r * 2 * getPixelsPerUnit()));
+            g.fillOval((int) (getScreenX(p.x) - p.r * getPixelsPerUnitX()),
+                    (int) (getScreenY(p.y) - p.r * getPixelsPerUnitX()),
+                    (int) (p.r * 2 * getPixelsPerUnitX()),
+                    (int) (p.r * 2 * getPixelsPerUnitX()));
             g.setColor(Color.white);
-            Font font = new Font("TimesRoman", Font.PLAIN, (int) (0.375 * getPixelsPerUnit()));
+            Font font = new Font("TimesRoman", Font.PLAIN, (int) (0.375 * getPixelsPerUnitX()));
             FontMetrics metrics = g.getFontMetrics(font);
             int tw = metrics.stringWidth(p.name);
             int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
@@ -183,16 +186,16 @@ public class TreePanel extends Animated2DView implements MouseListener {
         }
     }
 
-    private boolean particleIsVisible(Particle p){
-        return !(getScreenX(p.x)+p.r*getPixelsPerUnit() < 0 || getScreenX(p.x)-p.r*getPixelsPerUnit() > getWidth()
-                || getScreenY(p.y)+p.r*getPixelsPerUnit() < 0 || getScreenY(p.y)-p.r*getPixelsPerUnit() > getHeight());
+    private boolean particleNotVisible(Particle p){
+        return getScreenX(p.x) + p.r * getPixelsPerUnitX() < 0 || getScreenX(p.x) - p.r * getPixelsPerUnitX() > getWidth()
+                || getScreenY(p.y) + p.r * getPixelsPerUnitX() < 0 || getScreenY(p.y) - p.r * getPixelsPerUnitX() > getHeight();
     }
 
     private void drawLinks(Graphics g) {
         for (Link li : links) {
 
             // do not draw link if not visible
-            if(!particleIsVisible(li.getP1()) && !particleIsVisible(li.getP2()))
+            if(particleNotVisible(li.getP1()) && particleNotVisible(li.getP2()))
                 continue;
 
             String info = "";
@@ -216,7 +219,7 @@ public class TreePanel extends Animated2DView implements MouseListener {
             g.drawLine((int) getScreenX(li.getP1().x), (int) getScreenY(li.getP1().y), (int) getScreenX(li.getP2().x), (int) getScreenY(li.getP2().y));
 
             if (!info.isEmpty()) {
-                Font font = new Font("TimesRoman", Font.PLAIN, (int) (0.375 * getPixelsPerUnit()));
+                Font font = new Font("TimesRoman", Font.PLAIN, (int) (0.375 * getPixelsPerUnitX()));
                 FontMetrics metrics = g.getFontMetrics(font);
                 int tw = metrics.stringWidth(info);
                 int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
@@ -271,10 +274,12 @@ public class TreePanel extends Animated2DView implements MouseListener {
             for (Particle p : particles) {
                 float sx = getScreenX(p.x);
                 float sy = getScreenY(p.y);
-                if ((prevMouseX - sx) * (prevMouseX - sx) + (prevMouseY - sy) * (prevMouseY - sy) <= (p.r * getPixelsPerUnit() * p.r * getPixelsPerUnit())) {
-                    selected = p;
-                    p.setFixed(true);
-                    break;
+                if ((prevMouseX - sx) * (prevMouseX - sx) + (prevMouseY - sy) * (prevMouseY - sy) <= (p.r * getPixelsPerUnitX() * p.r * getPixelsPerUnitX())) {
+                    if(!p.isRoot()){
+                        selected = p;
+                        p.setFixed(true);
+                        break;
+                    }
                 }
             }
         }

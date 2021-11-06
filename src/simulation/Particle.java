@@ -1,4 +1,4 @@
-package gui;
+package simulation;
 
 public class Particle {
 

@@ -3,14 +3,21 @@ package gui;
 import eval.Evaluator;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class Graph2DPanel extends Animated2DView {
+public class Graph2DPanel extends Animated2DView implements MouseListener {
 
     private Evaluator currentEval;
 
+    private boolean scalingAxisX = false;
+    private boolean scalingAxisY = false;
+
     public Graph2DPanel(int w, int h, Evaluator evaluator) {
+        super();
         setPreferredSize(new Dimension(w, h));
         currentEval = evaluator;
+        addMouseListener(this);
     }
 
     @Override
@@ -36,16 +43,28 @@ public class Graph2DPanel extends Animated2DView {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setStroke(new BasicStroke(2));
 
-        float halfGradSize = getPixelsPerUnit() / 4;
-        g2.setColor(Color.black);
+        float halfGradSizeX = getPixelsPerUnitX() / 4;
+        float halfGradSizeY = getPixelsPerUnitY() / 4;
+
         // X axis
+        if((getScreenY(0)-5 < prevMouseY && getScreenY(0)+5 > prevMouseY) || scalingAxisX)
+            g2.setColor(Color.ORANGE);
+        else
+            g2.setColor(Color.black);
+
         g2.drawLine(0, (int) getScreenY(0), getWidth(), (int) getScreenY(0));
         for (float x = (float) Math.floor(getWorldX(0)); x < getWorldX(getWidth()); x++)
-            g2.drawLine((int) getScreenX(x), (int) (getScreenY(0) - halfGradSize), (int) getScreenX(x), (int) (getScreenY(0) + halfGradSize));
+            g2.drawLine((int) getScreenX(x), (int) (getScreenY(0) - halfGradSizeX), (int) getScreenX(x), (int) (getScreenY(0) + halfGradSizeX));
+
         // Y axis
+        if((getScreenX(0)-5 < prevMouseX && getScreenX(0)+5 > prevMouseX) || scalingAxisY)
+            g2.setColor(Color.ORANGE);
+        else
+            g2.setColor(Color.black);
+
         g2.drawLine((int) getScreenX(0), 0, (int) getScreenX(0), getHeight());
         for (float y = (float) Math.floor(getWorldY(0)); y > getWorldY(getHeight()); y--)
-            g2.drawLine((int) (getScreenX(0) - halfGradSize), (int) getScreenY(y), (int) (getScreenX(0) + halfGradSize), (int) getScreenY(y));
+            g2.drawLine((int) (getScreenX(0) - halfGradSizeY), (int) getScreenY(y), (int) (getScreenX(0) + halfGradSizeY), (int) getScreenY(y));
         g2.dispose();
     }
 
@@ -65,7 +84,7 @@ public class Graph2DPanel extends Animated2DView {
         g2.setColor(Color.red);
         g2.setStroke(new BasicStroke(2));
 
-        float d = 1.0f / getPixelsPerUnit();
+        float d = 1.0f / getPixelsPerUnitX();
 
         int height = getHeight();
         float endX = getWorldX(getWidth());
@@ -105,4 +124,58 @@ public class Graph2DPanel extends Animated2DView {
         else
             return val;
     }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {}
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        prevMouseX = e.getX();
+        prevMouseY = e.getY();
+        scalingAxisX = (getScreenY(0)-5 < prevMouseY && getScreenY(0)+5 > prevMouseY);
+        scalingAxisY = (getScreenX(0)-5 < prevMouseX && getScreenX(0)+5 > prevMouseX);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        prevMouseX = e.getX();
+        prevMouseY = e.getY();
+        scalingAxisX = false;
+        scalingAxisY = false;
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (!scalingAxisX && !scalingAxisY) {
+            super.mouseDragged(e);
+            return;
+        }
+
+        // update base pixels per unit
+        if(scalingAxisX && scalingAxisY){
+            float dx = (getWorldX(e.getX())-getWorldX(prevMouseX))*getPixelsPerUnitX();
+            setPixelsPerUnitX(getPixelsPerUnitX()+dx);
+            setPixelsPerUnitY(getPixelsPerUnitY()+dx);
+        } else if(scalingAxisX){
+            float ratio = getWorldX(e.getX())/getWorldX(prevMouseX);
+            setPixelsPerUnitX(getPixelsPerUnitX()*ratio);
+        } else {
+            float ratio = getWorldY(e.getY())/getWorldY(prevMouseY);
+            setPixelsPerUnitY(getPixelsPerUnitY()*ratio);
+        }
+
+        if(getPixelsPerUnitX() < 1)
+            setPixelsPerUnitX(1);
+        if(getPixelsPerUnitY() < 1)
+            setPixelsPerUnitY(1);
+
+        prevMouseX = e.getX();
+        prevMouseY = e.getY();
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
 }
