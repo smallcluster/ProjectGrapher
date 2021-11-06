@@ -73,7 +73,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         for (float x = (float) Math.floor(getWorldX(0)); x < getWorldX(getWidth()); x++)
             g.drawLine((int) getScreenX(x), 0, (int) getScreenX(x), getHeight());
         for (float y = (float) Math.floor(getWorldY(0)); y > getWorldY(getHeight()); y--)
-            g.drawLine((int) 0, (int) getScreenY(y), getWidth(), (int) getScreenY(y));
+            g.drawLine( 0, (int) getScreenY(y), getWidth(), (int) getScreenY(y));
     }
 
     public void drawFunction(Graphics g) {
@@ -117,12 +117,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     }
 
     public float clamp(float val, float min, float max) {
-        if (val < min)
-            return min;
-        else if (val > max)
-            return max;
-        else
-            return val;
+        return Math.max(Math.min(val, max), min);
     }
 
     @Override
@@ -157,11 +152,25 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
             setPixelsPerUnitX(getPixelsPerUnitX()+dx);
             setPixelsPerUnitY(getPixelsPerUnitY()+dx);
         } else if(scalingAxisX){
-            float ratio = getWorldX(e.getX())/getWorldX(prevMouseX);
-            setPixelsPerUnitX(getPixelsPerUnitX()*ratio);
+            float x = getWorldX(prevMouseX);
+
+            if( x < 0.001 && x > -0.001){
+                float dx = (getWorldX(e.getX())-getWorldX(prevMouseX))*getPixelsPerUnitX();
+                setPixelsPerUnitX(getPixelsPerUnitX()+dx);
+            } else {
+                float ratio = getWorldX(e.getX())/getWorldX(prevMouseX);
+                setPixelsPerUnitX(getPixelsPerUnitX()*ratio);
+            }
+
         } else {
-            float ratio = getWorldY(e.getY())/getWorldY(prevMouseY);
-            setPixelsPerUnitY(getPixelsPerUnitY()*ratio);
+            float y = getWorldY(prevMouseY);
+            if( y < 0.001 && y > -0.001){
+                float dy = (getWorldY(e.getY())-getWorldY(prevMouseY))*getPixelsPerUnitY();
+                setPixelsPerUnitY(getPixelsPerUnitY()+dy);
+            } else {
+                float ratio = getWorldY(e.getY())/getWorldY(prevMouseY);
+                setPixelsPerUnitY(getPixelsPerUnitY()*ratio);
+            }
         }
 
         if(getPixelsPerUnitX() < 1)
