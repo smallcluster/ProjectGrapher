@@ -4,68 +4,23 @@ import eval.Evaluator;
 import eval.tree.Node;
 import eval.tree.TestIF;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import static javax.swing.SwingUtilities.invokeAndWait;
 
-public class TreePanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener {
+public class TreePanel extends Animated2DView implements MouseListener {
 
     private final Evaluator evaluator;
     private final float DELTA = 1.0f / 60.0f;
-    private float mouseX = 0;
-    private float mouseY = 0;
-    private float offsetX = 0;
-    private float offsetY = 0;
-    private float zoom = 0.5f;
     private final ArrayList<Particle> particles = new ArrayList<>();
     private final ArrayList<Link> links = new ArrayList<>();
-    private int fps = 60;
-
     private Particle selected = null;
-
-    final Runnable refresh = new Runnable() {
-        @Override
-        public void run() {
-            update(DELTA);
-            repaint();
-        }
-    };
 
     public TreePanel(Evaluator evaluator) {
         this.evaluator = evaluator;
-        addMouseMotionListener(this);
-        addMouseWheelListener(this);
         addMouseListener(this);
-        Thread drawingThread = new Thread(){
-            public void run(){
-                while (true){
-                    long startTime = System.nanoTime();
-                    try {
-                        invokeAndWait(refresh);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                    double delta = ((System.nanoTime()-startTime)/1000000000.0);
-                    double remainingTime = Math.max(1.0/60.0 - delta, 0);
-                    long sleepTime = (int) (remainingTime*1000.0);
-                    try {
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    delta = ((System.nanoTime()-startTime)/1000000000.0);
-                    fps = (int) (1.0/delta);
-                }
-            }
-        };
-        drawingThread.setDaemon(true);
-        drawingThread.start();
+        basePixelsPerUnit = 32.0f;
     }
 
     public void buildParticleSim() {
@@ -85,19 +40,19 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
     public void repelParticles(float delta) {
         synchronized (particles) {
             for (int i = 0; i < particles.size(); i++) {
-                for (int j = i+1; j < particles.size(); j++) {
+                for (int j = i + 1; j < particles.size(); j++) {
                     Particle p1 = particles.get(i);
                     Particle p2 = particles.get(j);
-                    p1.repel(p2, delta);
+                    p1.repel(p2, delta, 10.0f);
                 }
             }
         }
     }
 
-    public void updateParticlesPos(float delta) {
+    public void updateParticlesPos() {
         synchronized (particles) {
             for (Particle p : particles) {
-                p.update(delta);
+                p.update();
             }
         }
     }
@@ -105,6 +60,7 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
     public void updateLinks() {
         // update constraints
         synchronized (links) {
+            // links us
             for (Link li : links)
                 li.update();
         }
@@ -113,10 +69,10 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
     public Particle createParticlesFromTree(Node tree, boolean root) {
         Particle p;
         if (root) {
-            p = new Particle(tree.getName(), 0, 0, 32);
+            p = new Particle(tree.getName(), 0, 0, 0.5f);
             p.markAsRoot();
         } else {
-            p = new Particle(tree.getName(), (float) (2 * Math.random() - 1) * 64.0f,(float) (2 * Math.random() - 1) * 64.0f, 32);
+            p = new Particle(tree.getName(), (float) (2 * Math.random() - 1), (float) (2 * Math.random() - 1), 0.5f);
         }
         Node left = tree.getLeft();
         Node right = tree.getRight();
@@ -130,7 +86,7 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
                 particles.add(condP);
             }
             synchronized (links) {
-                links.add(new Link(p, condP, 128, Link.Type.COND));
+                links.add(new Link(p, condP, 2, Link.Type.COND));
             }
         }
         if (left != null) {
@@ -140,7 +96,7 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
             }
             Link.Type type = tree.getName().equals("IF") ? Link.Type.TRUE : Link.Type.NORMAL;
             synchronized (links) {
-                links.add(new Link(p, leftP, 128, type));
+                links.add(new Link(p, leftP, 2, type));
             }
 
         }
@@ -151,23 +107,23 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
             }
             Link.Type type = tree.getName().equals("IF") ? Link.Type.FALSE : Link.Type.NORMAL;
             synchronized (links) {
-                links.add(new Link(p, rightP, 128, type));
+                links.add(new Link(p, rightP, 2, type));
             }
         }
         return p;
     }
 
-    public void recrush(){
-        synchronized (particles){
+    public void recrush() {
+        synchronized (particles) {
             for (Particle p : particles) {
-                if(p.isRoot()){
+                if (p.isRoot()) {
                     p.x = 0;
                     p.y = 0;
                     p.oldy = 0;
                     p.oldx = 0;
                 } else {
-                    p.x = (float) (2 * Math.random() - 1) * 64.0f;
-                    p.y = (float) (2 * Math.random() - 1) * 64.0f;
+                    p.x = (float) (2 * Math.random() - 1);
+                    p.y = (float) (2 * Math.random() - 1);
                     p.oldx = p.x;
                     p.oldy = p.y;
                     p.setFixed(false);
@@ -180,50 +136,96 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
     public void paint(Graphics g) {
         super.paint(g);
 
-        float centerX = getWidth() / 2.0f + offsetX;
-        float centerY = getHeight() / 2.0f + offsetY;
-
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());
 
+        // Axes
         g.setColor(Color.lightGray);
-        g.drawLine(0, (int) centerY, getWidth(), (int) centerY);
-        g.drawLine((int) centerX, 0, (int) centerX, getHeight());
+        g.drawLine(0, (int) getScreenY(0), getWidth(), (int) getScreenY(0));
+        g.drawLine((int) getScreenX(0), 0, (int) getScreenX(0), getHeight());
 
+        // lock links and particles while rendering
         synchronized (links) {
-            for (Link li : links) {
-                li.paint(g, centerX, centerY, zoom);
-            }
+            drawLinks(g);
         }
         synchronized (particles) {
-            for (Particle p : particles) {
-                p.paint(g, centerX, centerY, zoom);
-            }
+            drawParticles(g);
         }
 
         // Draw fps
         drawFps(g);
     }
 
-    private void drawFps(Graphics g){
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        Font font = new Font("TimesRoman", Font.BOLD, 16);
-        FontMetrics metrics = g2.getFontMetrics(font);
-        String fpsinfo = fps+" FPS";
-        int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
-        g2.setColor(Color.black);
-        g2.setFont(font);
-        g2.drawString(fpsinfo, 4, th*2);
-        g2.dispose();
+    private void drawParticles(Graphics g) {
+        for (Particle p : particles) {
+            if (p.isRoot())
+                g.setColor(Color.red);
+            else if (p.isFixed())
+                g.setColor(Color.blue);
+            else
+                g.setColor(Color.black);
+            g.fillOval((int) (getScreenX(p.x) - p.r * getPixelsPerUnit()),
+                    (int) (getScreenY(p.y) - p.r * getPixelsPerUnit()),
+                    (int) (p.r * 2 * getPixelsPerUnit()),
+                    (int) (p.r * 2 * getPixelsPerUnit()));
+            g.setColor(Color.white);
+            Font font = new Font("TimesRoman", Font.PLAIN, (int) (0.375 * getPixelsPerUnit()));
+            FontMetrics metrics = g.getFontMetrics(font);
+            int tw = metrics.stringWidth(p.name);
+            int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
+            g.setFont(font);
+            g.drawString(p.name, (int) (getScreenX(p.x) - tw / 2.0), (int) (getScreenY(p.y) + th / 2.0));
+        }
     }
 
-    public void moveSelected(){
+    private void drawLinks(Graphics g) {
+        for (Link li : links) {
+            String info = "";
+            switch (li.getType()) {
+                case NORMAL:
+                    g.setColor(Color.black);
+                    break;
+                case COND:
+                    g.setColor(Color.blue);
+                    info = "COND";
+                    break;
+                case TRUE:
+                    g.setColor(Color.green);
+                    info = "TRUE";
+                    break;
+                case FALSE:
+                    g.setColor(Color.red);
+                    info = "FALSE";
+                    break;
+            }
+            g.drawLine((int) getScreenX(li.getP1().x), (int) getScreenY(li.getP1().y), (int) getScreenX(li.getP2().x), (int) getScreenY(li.getP2().y));
+
+            if (!info.isEmpty()) {
+                Font font = new Font("TimesRoman", Font.PLAIN, (int) (0.375 * getPixelsPerUnit()));
+                FontMetrics metrics = g.getFontMetrics(font);
+                int tw = metrics.stringWidth(info);
+                int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
+                float x = (li.getP2().x + li.getP1().x) / 2.0f;
+                float y = (li.getP2().y + li.getP1().y) / 2.0f;
+                g.setFont(font);
+                g.drawString(info, (int) (getScreenX(x) - tw / 2.0), (int) (getScreenY(y) + th / 2.0));
+            }
+        }
+    }
+
+    @Override
+    public void updateLogic() {
+        moveSelected();
+        updateParticlesPos();
+        for (int i = 0; i < 10; i++)
+            updateLinks();
+        repelParticles(DELTA);
+    }
+
+    public void moveSelected() {
         if (selected != null) {
-            float centerX = getWidth() / 2.0f + offsetX;
-            float centerY = getHeight() / 2.0f + offsetY;
-            float x = (mouseX - centerX) / zoom;
-            float y = (mouseY - centerY) / zoom;
+            float x = getWorldX(prevMouseX);
+            float y = getWorldY(prevMouseY);
             selected.x = x;
             selected.y = y;
             selected.oldx = x;
@@ -231,70 +233,30 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
         }
     }
 
-    public void update(float delta) {
-        moveSelected();
-        updateParticlesPos(delta);
-        for (int i = 0; i < 10; i++)
-            updateLinks();
-        repelParticles(delta);
-    }
-
-    public void recenter(){
-        offsetY = 0;
-        offsetX = 0;
-    }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        float mx = mouseX;
-        float my = mouseY;
-        mouseX = e.getX();
-        mouseY = e.getY();
         if (selected == null) {
-            offsetX += mouseX - mx;
-            offsetY += mouseY - my;
+            super.mouseDragged(e);
+        } else {
+            prevMouseX = e.getX();
+            prevMouseY = e.getY();
         }
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        float centerX = getWidth() / 2.0f + offsetX;
-        float centerY = getHeight() / 2.0f + offsetY;
-        float mx = (e.getX() - centerX) / zoom;
-        float my = (e.getY() - centerY) / zoom;
-        zoom -= zoom * e.getWheelRotation() / 10.0f;
-        if (zoom <= 0.1f)
-            zoom = 0.1f;
-        else if (zoom >= 100.0f)
-            zoom = 100.0f;
-        float newmx = (e.getX() - centerX) / zoom;
-        float newmy = (e.getY() - centerY) / zoom;
-        offsetX += (newmx - mx) * zoom;
-        offsetY += (newmy - my) * zoom;
-    }
-
-    @Override
     public void mouseClicked(MouseEvent e) {
-
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
-        float centerX = getWidth() / 2.0f + offsetX;
-        float centerY = getHeight() / 2.0f + offsetY;
+        prevMouseX = e.getX();
+        prevMouseY = e.getY();
         synchronized (particles) {
             for (Particle p : particles) {
-                float sx = p.x * zoom + centerX;
-                float sy = p.y * zoom + centerY;
-                if ((mouseX - sx) * (mouseX - sx) + (mouseY - sy) * (mouseY - sy) <= (p.r * zoom * p.r * zoom)) {
+                float sx = getScreenX(p.x);
+                float sy = getScreenY(p.y);
+                if ((prevMouseX - sx) * (prevMouseX - sx) + (prevMouseY - sy) * (prevMouseY - sy) <= (p.r * getPixelsPerUnit() * p.r * getPixelsPerUnit())) {
                     selected = p;
                     p.setFixed(true);
                     break;
@@ -305,10 +267,10 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
-        if(selected != null){
-            if(e.getButton() == MouseEvent.BUTTON1)
+        prevMouseX = e.getX();
+        prevMouseY = e.getY();
+        if (selected != null) {
+            if (e.getButton() == MouseEvent.BUTTON1)
                 selected.setFixed(false);
             selected = null;
         }
@@ -316,11 +278,9 @@ public class TreePanel extends JPanel implements MouseMotionListener, MouseWheel
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
     }
 }

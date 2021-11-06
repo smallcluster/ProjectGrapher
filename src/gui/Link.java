@@ -1,11 +1,10 @@
 package gui;
 
-import java.awt.*;
-
 public class Link {
 
-    private Particle p1, p2;
-    private float restLength;
+    private final Particle p1;
+    private final Particle p2;
+    private final float restLength;
 
     enum Type {
         NORMAL,
@@ -80,37 +79,15 @@ public class Link {
         }
     }
 
-    public void paint(Graphics g, float offsetX, float offsetY, float zoom) {
-        String info = "";
-        switch (type) {
-            case NORMAL:
-                g.setColor(Color.black);
-                break;
-            case COND:
-                g.setColor(Color.blue);
-                info = "COND";
-                break;
-            case TRUE:
-                g.setColor(Color.green);
-                info = "TRUE";
-                break;
-            case FALSE:
-                g.setColor(Color.red);
-                info = "FALSE";
-                break;
-        }
-        g.drawLine((int) (p1.x * zoom + offsetX), (int) (p1.y * zoom + offsetY), (int) (p2.x * zoom + offsetX), (int) (p2.y * zoom + offsetY));
-
-        if (!info.isEmpty()) {
-            Font font = new Font("TimesRoman", Font.PLAIN, (int) (24 * zoom));
-            FontMetrics metrics = g.getFontMetrics(font);
-            int tw = metrics.stringWidth(info);
-            int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
-            float x = (p2.x+p1.x)/2.0f;
-            float y = (p2.y+p1.y)/2.0f;
-            g.setFont(font);
-            g.drawString(info, (int) (x * zoom + offsetX - tw / 2.0), (int) (y * zoom + offsetY + th / 2.0));
-        }
+    public Type getType() {
+        return type;
     }
 
+    public Particle getP1() {
+        return p1;
+    }
+
+    public Particle getP2() {
+        return p2;
+    }
 }

@@ -15,8 +15,9 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
     protected float prevMouseY = 0;
     protected int fps = 60;
     protected float time = 0.0f;
-    private float pixelsPerUnit = 64.0f;
+    protected float basePixelsPerUnit = 64.0f;
     protected float zoom = 1.0f;
+    protected int frameCap = 60;
 
 
     // --------- Threading ----------------
@@ -31,6 +32,9 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
     };
 
     public void stop(){
+        if(thread == null)
+            return;
+
         updating = false;
         try {
             thread.join();
@@ -40,7 +44,7 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
         thread = null;
     }
 
-    public void restart(int frameCap) {
+    public void restart() {
         if(thread != null)
             stop();
         updating = true;
@@ -99,7 +103,7 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
     }
 
     public float getPixelsPerUnit(){
-        return pixelsPerUnit*zoom;
+        return basePixelsPerUnit *zoom;
     }
 
 
