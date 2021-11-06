@@ -34,13 +34,8 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
     public void stop(){
         if(thread == null)
             return;
-
         updating = false;
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        thread.interrupt();
         thread = null;
     }
 
@@ -66,7 +61,7 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
                 try {
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    continue; // on ne met pas à jour le reste
                 }
                 // Update time and fps
                 delta = (System.nanoTime()-startTime)/1000000000.0;
