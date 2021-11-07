@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class GraphControl extends JPanel {
@@ -81,12 +80,7 @@ public class GraphControl extends JPanel {
             }
         };
 
-        ActionListener regionAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setGraphRegion();
-            }
-        };
+        ActionListener regionAction = e -> setGraphRegion();
 
         xmin.addDocumentListener(d);
         ymin.addDocumentListener(d);
