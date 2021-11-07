@@ -33,7 +33,12 @@ public class GraphControl extends JPanel {
         autoStep.setSelected(true);
         add(5, autoStep, 0);
         JButton recenter = new JButton("Recenter view");
-        add(6, recenter, 1);
+        add(6, recenter, 0);
+
+        JButton colorChoser = new JButton("Set color");
+        add(7, colorChoser, 1);
+
+        colorChoser.addActionListener(e -> setGraphColor());
 
         recenter.addActionListener(e -> graph2DPanel.recenter());
 
@@ -106,6 +111,11 @@ public class GraphControl extends JPanel {
         gc.weighty = weight;
         gc.anchor = GridBagConstraints.NORTH;
         add(c, gc);
+    }
+
+    private void setGraphColor(){
+        Color c = JColorChooser.showDialog(null, "Choose a color", Color.red);
+        graph2DPanel.setGraphColor(c);
     }
 
     private float getFloatFromInput(InputField input) {

@@ -13,12 +13,18 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     // Axis selection
     private boolean scalingAxisX = false;
     private boolean scalingAxisY = false;
+    private final Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
+    private final Cursor arrowCursor = new Cursor(Cursor.DEFAULT_CURSOR);
 
     // ------------------ Controls -----------------------
     private float step = 0.01f;
     private boolean autoStep = true;
+    private Color graphColor = Color.red;
 
     //  SETTERS
+    public void setGraphColor(Color c){
+        graphColor = c;
+    }
     public void setAutoStep(boolean b){
         autoStep = b;
         updateAutoStep();
@@ -136,7 +142,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        g2.setColor(Color.red);
+        g2.setColor(graphColor);
         g2.setStroke(new BasicStroke(2));
 
         int height = getHeight();
@@ -176,6 +182,18 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {}
+
+    @Override
+    public void mouseMoved(MouseEvent e){
+        super.mouseMoved(e);
+        if( (getScreenY(0)-5 < e.getY() && getScreenY(0)+5 > e.getY()) ||
+                (getScreenX(0)-5 < e.getX() && getScreenX(0)+5 > e.getX())
+        ){
+            setCursor(handCursor);
+        } else {
+            setCursor(arrowCursor);
+        }
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {
