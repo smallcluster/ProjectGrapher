@@ -162,7 +162,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         g2.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
         float y = currentEval.eval(getWorldX(prevMouseX), time);
         // draw only the visible part of the line
-        // because we can have freeze when drawing to infinity...
+        // because we can have freezes when drawing to infinity...
         float sy = getScreenY(y);
         if ((sy > 0) && (sy < getHeight()))
             g2.drawLine((int) clamp(getScreenX(0), 0, getWidth()), (int) clamp(sy, 0, getHeight()),

@@ -11,10 +11,10 @@ import java.awt.event.ActionListener;
 public class FuncInputField extends JPanel {
 
     private Evaluator evaluator;
-    private JTextField inputField;
-    private JLabel errorLog;
-    private Graph2DPanel graph2DPanel;
-    private TreePanel treePanel;
+    private final JTextField inputField;
+    private final JLabel errorLog;
+    private final Graph2DPanel graph2DPanel;
+    private final TreePanel treePanel;
 
     public FuncInputField(Graph2DPanel graph2DPanel, Evaluator evaluator, String expText, TreePanel treePanel){
         this.evaluator = evaluator;
@@ -44,9 +44,7 @@ public class FuncInputField extends JPanel {
         inputLogContainer.add(errorLog, BorderLayout.SOUTH);
 
         // Parse provided input to the current evaluator or raise error
-        ActionListener evalAction = e -> {
-            evalFunction();
-        };
+        ActionListener evalAction = e -> evalFunction();
 
         // Called on "Enter" key press
         inputField.addActionListener(evalAction);
@@ -74,18 +72,17 @@ public class FuncInputField extends JPanel {
     public void evalFunction(){
         int n = evaluator.parse(inputField.getText());
         if (n != -1) {
-            StringBuilder txt = new StringBuilder();
-            txt.append("<html>Expression error : char '");
-            txt.append("<font color=\"red\">");
-            txt.append(inputField.getText().charAt(n));
-            txt.append("</font>' at ");
-            txt.append(n + 1);
-            txt.append("</html>");
+            String txt = "<html>Expression error : char '" +
+                    "<font color=\"red\">" +
+                    inputField.getText().charAt(n) +
+                    "</font>' at " +
+                    (n + 1) +
+                    "</html>";
 
             inputField.setBackground(Color.red);
             inputField.setForeground(Color.white);
 
-            errorLog.setText(txt.toString());
+            errorLog.setText(txt);
             errorLog.setVisible(true);
         } else {
             inputField.setBackground(Color.white);

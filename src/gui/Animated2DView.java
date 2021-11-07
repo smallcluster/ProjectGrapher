@@ -27,12 +27,9 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
     // --------- Threading ----------------
     private Thread thread;
     private boolean updating = false;
-    private Runnable actions = new Runnable() {
-        @Override
-        public void run() {
-            updateLogic();
-            repaint();
-        }
+    private final Runnable actions = () -> {
+        updateLogic();
+        repaint();
     };
 
     public void stop(){

@@ -4,8 +4,6 @@ import gui.TreePanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 
 
 // 1h30
@@ -30,7 +28,7 @@ public class Main extends JFrame {
         graphActivity2D.add(graphControl, BorderLayout.WEST);
 
         activities.addTab("2D Graph", graphActivity2D);
-        graph2DPanel.restart(); // at first we are on the graph2DPanel
+        graph2DPanel.restart(); // at first, we are on the graph2DPanel
 
         // -------------- TREE TAB ---------------------------
         JPanel TreeActivity2D = new JPanel();
@@ -86,6 +84,6 @@ public class Main extends JFrame {
             } catch (Exception ex) {}
         }
 
-        Main app = new Main();
+        new Main();
     }
 }

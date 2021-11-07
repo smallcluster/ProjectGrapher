@@ -14,7 +14,6 @@ import java.util.ArrayList;
 public class TreePanel extends Animated2DView implements MouseListener {
 
     private final Evaluator evaluator;
-    private final float DELTA = 1.0f / 60.0f;
     private final ArrayList<Particle> particles = new ArrayList<>();
     private final ArrayList<Link> links = new ArrayList<>();
     private Particle selected = null;
@@ -248,6 +247,7 @@ public class TreePanel extends Animated2DView implements MouseListener {
         updateParticlesPos();
         for (int i = 0; i < 10; i++)
             updateLinks();
+        float DELTA = 1.0f / 60.0f;
         repelParticles(DELTA);
     }
 
