@@ -32,17 +32,18 @@ public class GraphControl extends JPanel {
         autoStep = new JCheckBox("auto step");
         autoStep.setSelected(true);
         add(5, autoStep, 0);
-        JButton recenter = new JButton("Recenter view");
-        add(6, recenter, 0);
-
         JButton colorChoser = new JButton("Set color");
-        add(7, colorChoser, 1);
+        add(6, colorChoser, 0);
+        JButton recenter = new JButton("Recenter view");
+        add(7, recenter, 0);
+        JCheckBox showGrid = new JCheckBox("Show grid");
+        showGrid.setSelected(true);
+        add(8, showGrid, 1);
 
         colorChoser.addActionListener(e -> setGraphColor());
-
         recenter.addActionListener(e -> graph2DPanel.recenter());
-
         autoStep.addActionListener(e -> graph2DPanel.setAutoStep(autoStep.isSelected()));
+        showGrid.addActionListener(e-> graph2DPanel.setShowGrid(showGrid.isSelected()));
 
 
         step.addDocumentListener(new DocumentListener() {

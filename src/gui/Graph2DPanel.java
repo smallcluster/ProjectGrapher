@@ -20,6 +20,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     private float step = 0.01f;
     private boolean autoStep = true;
     private Color graphColor = Color.red;
+    private boolean showGrid = true;
 
     //  SETTERS
     public void setGraphColor(Color c){
@@ -83,7 +84,8 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         // background
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());
-        drawGrid(g);
+        if(showGrid)
+            drawGrid(g);
         drawAxes(g);
         //Draw function
         if (currentEval.isExpValid()){
@@ -267,4 +269,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {}
 
+    public void setShowGrid(boolean selected) {
+        showGrid = selected;
+    }
 }
