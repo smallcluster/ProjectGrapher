@@ -13,8 +13,6 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     // Axis selection
     private boolean scalingAxisX = false;
     private boolean scalingAxisY = false;
-    private final Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
-    private final Cursor arrowCursor = new Cursor(Cursor.DEFAULT_CURSOR);
 
     // ------------------ Controls -----------------------
     private float step = 0.01f;

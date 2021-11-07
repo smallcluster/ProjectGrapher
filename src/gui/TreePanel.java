@@ -160,10 +160,11 @@ public class TreePanel extends Animated2DView implements MouseListener {
     }
 
     private void drawParticles(Graphics g) {
+        boolean possibleSelection = false;
         for (Particle p : particles) {
 
             // do not draw particle if not visible
-            if(particleNotVisible(p))
+            if (particleNotVisible(p))
                 continue;
 
             if (p.isRoot())
@@ -176,6 +177,7 @@ public class TreePanel extends Animated2DView implements MouseListener {
                     (int) (getScreenY(p.y) - p.r * getPixelsPerUnitX()),
                     (int) (p.r * 2 * getPixelsPerUnitX()),
                     (int) (p.r * 2 * getPixelsPerUnitX()));
+
             g.setColor(Color.white);
             Font font = new Font("TimesRoman", Font.PLAIN, (int) (0.375 * getPixelsPerUnitX()));
             FontMetrics metrics = g.getFontMetrics(font);
@@ -183,10 +185,19 @@ public class TreePanel extends Animated2DView implements MouseListener {
             int th = metrics.getHeight() + (metrics.getDescent() - metrics.getAscent());
             g.setFont(font);
             g.drawString(p.name, (int) (getScreenX(p.x) - tw / 2.0), (int) (getScreenY(p.y) + th / 2.0));
+
+            // Change to hand cursor if mouse hover a selectable particle
+            if (mouseHoverParticle(p) && !p.isRoot())
+                possibleSelection = true;
         }
+
+        if (possibleSelection)
+            setCursor(handCursor);
+        else
+            setCursor(arrowCursor);
     }
 
-    private boolean particleNotVisible(Particle p){
+    private boolean particleNotVisible(Particle p) {
         return getScreenX(p.x) + p.r * getPixelsPerUnitX() < 0 || getScreenX(p.x) - p.r * getPixelsPerUnitX() > getWidth()
                 || getScreenY(p.y) + p.r * getPixelsPerUnitX() < 0 || getScreenY(p.y) - p.r * getPixelsPerUnitX() > getHeight();
     }
@@ -195,7 +206,7 @@ public class TreePanel extends Animated2DView implements MouseListener {
         for (Link li : links) {
 
             // do not draw link if not visible
-            if(particleNotVisible(li.getP1()) && particleNotVisible(li.getP2()))
+            if (particleNotVisible(li.getP1()) && particleNotVisible(li.getP2()))
                 continue;
 
             String info = "";
@@ -266,20 +277,22 @@ public class TreePanel extends Animated2DView implements MouseListener {
     public void mouseClicked(MouseEvent e) {
     }
 
+    public boolean mouseHoverParticle(Particle p) {
+        float sx = getScreenX(p.x);
+        float sy = getScreenY(p.y);
+        return (prevMouseX - sx) * (prevMouseX - sx) + (prevMouseY - sy) * (prevMouseY - sy) <= (p.r * getPixelsPerUnitX() * p.r * getPixelsPerUnitX());
+    }
+
     @Override
     public void mousePressed(MouseEvent e) {
         prevMouseX = e.getX();
         prevMouseY = e.getY();
         synchronized (particles) {
             for (Particle p : particles) {
-                float sx = getScreenX(p.x);
-                float sy = getScreenY(p.y);
-                if ((prevMouseX - sx) * (prevMouseX - sx) + (prevMouseY - sy) * (prevMouseY - sy) <= (p.r * getPixelsPerUnitX() * p.r * getPixelsPerUnitX())) {
-                    if(!p.isRoot()){
-                        selected = p;
-                        p.setFixed(true);
-                        break;
-                    }
+                if (mouseHoverParticle(p) && !p.isRoot()) {
+                    selected = p;
+                    p.setFixed(true);
+                    break;
                 }
             }
         }

@@ -15,6 +15,8 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
     protected float prevMouseY = 0;
     protected int fps = 60;
     protected float time = 0.0f;
+    protected final Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
+    protected final Cursor arrowCursor = new Cursor(Cursor.DEFAULT_CURSOR);
 
     private float pixelsPerUnitX = 64.0f;
     private float pixelsPerUnitY = 64.0f;
