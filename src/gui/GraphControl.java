@@ -9,8 +9,18 @@ import java.awt.event.ActionListener;
 public class GraphControl extends JPanel {
     private Graph2DPanel graph2DPanel;
 
-    private InputField xmin, xmax, ymin, ymax, step;
-    private JCheckBox autoStep;
+    private final InputField xmin, xmax, ymin, ymax, step;
+    private final JCheckBox autoStep;
+    private final JCheckBox showGrid;
+
+    public void setAutoStep(boolean b){
+        autoStep.setSelected(b);
+        graph2DPanel.setAutoStep(b);
+    }
+    public void setShowGrid(boolean b){
+        showGrid.setSelected(b);
+        graph2DPanel.setShowGrid(b);
+    }
 
     public GraphControl(Graph2DPanel graph2DPanel) {
         setLayout(new GridBagLayout());
@@ -37,7 +47,7 @@ public class GraphControl extends JPanel {
         add(autoStep, 0, gc);
         JButton recenter = new JButton("Recenter view");
         add(recenter, 0, gc);
-        JCheckBox showGrid = new JCheckBox("Show grid");
+        showGrid = new JCheckBox("Show grid");
         showGrid.setSelected(true);
         add(showGrid, 1, gc);
 
@@ -129,6 +139,8 @@ public class GraphControl extends JPanel {
         }
 
     }
+
+
 
     private void setGraphRegion() {
         float minx = getFloatFromInput(xmin);

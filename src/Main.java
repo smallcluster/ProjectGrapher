@@ -9,6 +9,15 @@ import java.awt.*;
 // 1h30
 public class Main extends JFrame {
 
+    private final Graph2DPanel graph2DPanel;
+    private final FuncInputField funcInputField;
+    private final GraphControl graphControl;
+    private final FunctionList functionList;
+
+    // file path
+    // if empty, show a file selection dialog
+    private String path = "";
+
 
     public Main() {
         setLayout(new BorderLayout());
@@ -17,7 +26,7 @@ public class Main extends JFrame {
 
 
         // Function List
-        FunctionList functionList = new FunctionList();
+        functionList = new FunctionList();
         JScrollPane funcListScroller = new JScrollPane(functionList);
         funcListScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -29,11 +38,11 @@ public class Main extends JFrame {
         JPanel graphActivity2D = new JPanel();
         graphActivity2D.setLayout(new BorderLayout());
         // Graph view
-        Graph2DPanel graph2DPanel = new Graph2DPanel(1280, 720, functionList);
+        graph2DPanel = new Graph2DPanel(1280, 720, functionList);
         graphActivity2D.add(graph2DPanel, BorderLayout.CENTER);
 
         // Graph controls
-        GraphControl graphControl = new GraphControl(graph2DPanel);
+        graphControl = new GraphControl(graph2DPanel);
 
         JPanel graphControlAndFunclist = new JPanel();
         graphControlAndFunclist.setLayout(new GridBagLayout());
@@ -42,15 +51,17 @@ public class Main extends JFrame {
         gc.fill = GridBagConstraints.HORIZONTAL;
         graphControlAndFunclist.add(graphControl, gc);
         gc.gridy = 1;
-        gc.insets = new Insets(10, 0, 0, 0);
+        gc.insets = new Insets(5, 0, 5, 0);
         JLabel label = new JLabel("Functions:", JLabel.CENTER);
+        graphControlAndFunclist.add(new JSeparator(), gc);
+        gc.gridy = 2;
         graphControlAndFunclist.add(label, gc);
         gc.insets = new Insets(0, 0, 0, 0);
-        gc.gridy = 2;
+        gc.gridy = 3;
         gc.weighty = 1;
         graphControlAndFunclist.add(funcListScroller, gc);
         JScrollPane graphControlScroller = new JScrollPane(graphControlAndFunclist);
-        graphControlScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //graphControlScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 
         graphActivity2D.add(graphControlScroller, BorderLayout.WEST);
@@ -76,7 +87,7 @@ public class Main extends JFrame {
         // ------------------ FUNC INPUT --------------------------------
         String input = "exp((sin(cos(x+TIME )^3)+sin(10*x)*0.1+sin(x/4)*2+cos(10+25*x)*0.05)*( |x| % 4 < 2  ? sin(-TIME)/2 : cos(TIME)/2))";
         // Current evaluated function input and error info
-        FuncInputField funcInputField = new FuncInputField(graph2DPanel, evaluator, input, treePanel, functionList);
+        funcInputField = new FuncInputField(graph2DPanel, evaluator, input, treePanel, functionList);
         add(funcInputField, BorderLayout.SOUTH);
 
 
@@ -84,6 +95,39 @@ public class Main extends JFrame {
         functionList.setFuncInputField(funcInputField);
 
         graph2DPanel.restart(); // at first, we are on the graph2DPanel
+
+
+        // ----------------------------- MENU BAR --------------------------------
+        /*
+        JMenuBar menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+
+        JMenu fileMenu = new JMenu("File");
+        menuBar.add(fileMenu);
+
+        JMenuItem newFileItem = new JMenuItem("New File");
+        fileMenu.add(newFileItem);
+
+        newFileItem.addActionListener(e->{
+            graph2DPanel.setPixelsPerUnitX(64.0f);
+            graph2DPanel.setPixelsPerUnitY(64.0f);
+            graph2DPanel.setOffsetX(0);
+            graph2DPanel.setOffsetY(0);
+            graphControl.setAutoStep(true);
+            graphControl.setShowGrid(true);
+            functionList.clear();
+            funcInputField.setFunction(new Function("F", null, "", Color.red));
+        });
+
+
+        fileMenu.add(new JSeparator());
+        JMenuItem saveFileAsItem = new JMenuItem("Save File As ...");
+        fileMenu.add(saveFileAsItem);
+        JMenuItem openFileItem = new JMenuItem("Open File...");
+        fileMenu.add(openFileItem);
+        */
+
+
 
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

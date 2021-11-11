@@ -18,6 +18,7 @@ class FunctionControls extends JPanel{
     private final JButton remove;
     private final JButton selector;
     private final JButton color;
+    private final JCheckBox visibility;
 
     public FunctionControls(Function f){
         function = f;
@@ -25,9 +26,9 @@ class FunctionControls extends JPanel{
         GridBagConstraints gc = new GridBagConstraints();
         gc.fill = GridBagConstraints.HORIZONTAL;
         // Visibility checkbox
-        JCheckBox visibility = new JCheckBox();
+        visibility = new JCheckBox();
         add(visibility, gc);
-        visibility.addActionListener(e->f.setVisible(visibility.isSelected()));
+        visibility.addActionListener(e->function.setVisible(visibility.isSelected()));
         visibility.setSelected(true);
         // Color picker
         color = new JButton(" ");
@@ -35,8 +36,8 @@ class FunctionControls extends JPanel{
         gc.gridx = 1;
         add(color, gc);
         color.addActionListener(e->{
-            Color c = JColorChooser.showDialog(null, "Choose a color", f.getColor());
-            f.setColor(c);
+            Color c = JColorChooser.showDialog(null, "Choose a color", function.getColor());
+            function.setColor(c);
             color.setBackground(c);
         });
         // Function selection
@@ -61,6 +62,7 @@ class FunctionControls extends JPanel{
     }
     public void setFunction(Function f){
         function = f;
+        function.setVisible(visibility.isSelected());
         color.setBackground(f.getColor());
     }
 }
@@ -122,6 +124,11 @@ public class FunctionList extends JPanel {
             }
         }
         return list;
+    }
+
+    public void clear(){
+        removeAll();
+        funcContList.clear();
     }
 
 }
