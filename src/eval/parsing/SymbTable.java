@@ -25,18 +25,18 @@ class SymbTable {
         addEntry(Token.Type.VARIABLE, "TIME", new VarFactory("TIME"));
 
         // FUNCTIONS
-        addEntry(Token.Type.FUNCTION, "sin", new FuncFactory("sin"));
-        addEntry(Token.Type.FUNCTION, "cos", new FuncFactory("cos"));
-        addEntry(Token.Type.FUNCTION, "tan", new FuncFactory("tan"));
-        addEntry(Token.Type.FUNCTION, "sqrt", new FuncFactory("sqrt"));
-        addEntry(Token.Type.FUNCTION, "abs", new FuncFactory("abs"));
-        addEntry(Token.Type.FUNCTION, "ln", new FuncFactory("ln"));
-        addEntry(Token.Type.FUNCTION, "log10", new FuncFactory("log10"));
-        addEntry(Token.Type.FUNCTION, "min", new FuncFactory("min"));
-        addEntry(Token.Type.FUNCTION, "max", new FuncFactory("max"));
-        addEntry(Token.Type.FUNCTION, "exp", new FuncFactory("exp"));
-        addEntry(Token.Type.FUNCTION, "diff", new FuncFactory("diff"));
-        addEntry(Token.Type.FUNCTION, "random", new FuncFactory("random"));
+        addEntry(Token.Type.FUNCTION, "sin", new FuncFactory("sin", 1));
+        addEntry(Token.Type.FUNCTION, "cos", new FuncFactory("cos", 1));
+        addEntry(Token.Type.FUNCTION, "tan", new FuncFactory("tan", 1));
+        addEntry(Token.Type.FUNCTION, "sqrt", new FuncFactory("sqrt", 1));
+        addEntry(Token.Type.FUNCTION, "abs", new FuncFactory("abs", 1));
+        addEntry(Token.Type.FUNCTION, "ln", new FuncFactory("ln", 1));
+        addEntry(Token.Type.FUNCTION, "log10", new FuncFactory("log10", 1));
+        addEntry(Token.Type.FUNCTION, "min", new FuncFactory("min", 2));
+        addEntry(Token.Type.FUNCTION, "max", new FuncFactory("max", 2));
+        addEntry(Token.Type.FUNCTION, "exp", new FuncFactory("exp", 1));
+        addEntry(Token.Type.FUNCTION, "diff", new FuncFactory("diff", 1));
+        addEntry(Token.Type.FUNCTION, "random", new FuncFactory("random", 0));
 
     }
 

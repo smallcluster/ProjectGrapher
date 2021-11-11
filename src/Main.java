@@ -97,11 +97,13 @@ public class Main extends JFrame {
         graph2DPanel.restart(); // at first, we are on the graph2DPanel
 
 
+        // TODO: provide functionality
         // ----------------------------- MENU BAR --------------------------------
-        /*
+
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
+        // File menu
         JMenu fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
 
@@ -125,8 +127,30 @@ public class Main extends JFrame {
         fileMenu.add(saveFileAsItem);
         JMenuItem openFileItem = new JMenuItem("Open File...");
         fileMenu.add(openFileItem);
-        */
 
+        // Edit menu
+        JMenu editMenu = new JMenu("Edit");
+        menuBar.add(editMenu);
+        JMenuItem settingsItem = new JMenuItem("Settings");
+        editMenu.add(settingsItem);
+
+        // View menu
+        JMenu viewMenu = new JMenu("View");
+        menuBar.add(viewMenu);
+        JCheckBoxMenuItem fpsItem = new JCheckBoxMenuItem("Show FPS");
+        fpsItem.setSelected(true);
+        viewMenu.add(fpsItem);
+        JCheckBoxMenuItem controlItem = new JCheckBoxMenuItem("Show controls");
+        controlItem.setSelected(true);
+        viewMenu.add(controlItem);
+
+        // Help menu
+        JMenu helpMenu = new JMenu("Help");
+        menuBar.add(helpMenu);
+        JMenuItem aboutItem = new JMenuItem("About");
+        helpMenu.add(aboutItem);
+        JMenuItem manualItem = new JMenuItem("Manual");
+        helpMenu.add(manualItem);
 
 
         pack();

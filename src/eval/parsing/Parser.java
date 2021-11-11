@@ -15,28 +15,28 @@ public class Parser {
     private NodeFactory lookAheadFactory;
 
     // Some token
-    private Token lt = new Token(Token.Type.OPERATOR, "<");
-    private Token le = new Token(Token.Type.OPERATOR, "<=");
-    private Token gt = new Token(Token.Type.OPERATOR, ">");
-    private Token ge = new Token(Token.Type.OPERATOR, ">=");
-    private Token eq = new Token(Token.Type.OPERATOR, "==");
-    private Token neq = new Token(Token.Type.OPERATOR, "!=");
-    private Token neg = new Token(Token.Type.OPERATOR, "!");
-    private Token tern = new Token(Token.Type.OTHER, "?");
-    private Token testsep = new Token(Token.Type.OTHER, ":");
-    private Token and = new Token(Token.Type.OPERATOR, "&&");
-    private Token or = new Token(Token.Type.OPERATOR, "||");
-    private Token mult = new Token(Token.Type.OPERATOR, "*");
-    private Token EOL = new Token(Token.Type.EOL, "EOL");
-    private Token minus = new Token(Token.Type.OPERATOR, "-");
-    private Token add = new Token(Token.Type.OPERATOR, "+");
-    private Token div = new Token(Token.Type.OPERATOR, "/");
-    private Token pow = new Token(Token.Type.OPERATOR, "^");
-    private Token mod = new Token(Token.Type.OPERATOR, "%");
-    private Token bar = new Token(Token.Type.OTHER, "|");
-    private Token openGroup = new Token(Token.Type.OTHER, "(");
-    private Token closeGroup = new Token(Token.Type.OTHER, ")");
-    private Token coma = new Token(Token.Type.OTHER, ",");
+    private final Token lt = new Token(Token.Type.OPERATOR, "<");
+    private final Token le = new Token(Token.Type.OPERATOR, "<=");
+    private final Token gt = new Token(Token.Type.OPERATOR, ">");
+    private final Token ge = new Token(Token.Type.OPERATOR, ">=");
+    private final Token eq = new Token(Token.Type.OPERATOR, "==");
+    private final Token neq = new Token(Token.Type.OPERATOR, "!=");
+    private final Token neg = new Token(Token.Type.OPERATOR, "!");
+    private final Token tern = new Token(Token.Type.OTHER, "?");
+    private final Token testsep = new Token(Token.Type.OTHER, ":");
+    private final Token and = new Token(Token.Type.OPERATOR, "&&");
+    private final Token or = new Token(Token.Type.OPERATOR, "||");
+    private final Token mult = new Token(Token.Type.OPERATOR, "*");
+    private final Token EOL = new Token(Token.Type.EOL, "EOL");
+    private final Token minus = new Token(Token.Type.OPERATOR, "-");
+    private final Token add = new Token(Token.Type.OPERATOR, "+");
+    private final Token div = new Token(Token.Type.OPERATOR, "/");
+    private final Token pow = new Token(Token.Type.OPERATOR, "^");
+    private final Token mod = new Token(Token.Type.OPERATOR, "%");
+    private final Token bar = new Token(Token.Type.OTHER, "|");
+    private final Token openGroup = new Token(Token.Type.OTHER, "(");
+    private final Token closeGroup = new Token(Token.Type.OTHER, ")");
+    private final Token coma = new Token(Token.Type.OTHER, ",");
 
 
     public Node parse(Reader input) throws ParserException {
@@ -51,8 +51,7 @@ public class Parser {
                 e.printStackTrace();
             throw new ParserException("Can't get a new token -> "+e.getMessage());
         }
-        Node l = L();
-        return l;
+        return L();
     }
 
     private void match(Token t) throws ParserException {
@@ -179,7 +178,7 @@ public class Parser {
             match(lookAhead);
             Node h = H();
             match(bar);
-            return new FuncFactory("abs").createNew(h);
+            return new FuncFactory("abs", 1).createNew(h);
         }
         // ( H )
         else if(lookAhead.match(openGroup)){
@@ -190,12 +189,14 @@ public class Parser {
         }
         // functions
         else if(lookAhead.getType() == Token.Type.FUNCTION) {
-            NodeFactory funcFactory = lookAheadFactory;
+            FuncFactory funcFactory = (FuncFactory) lookAheadFactory;
             match(lookAhead);
             match(openGroup);
             // FUNCTION ()
             if(lookAhead.match(closeGroup)){
                 match(closeGroup);
+                if(funcFactory.getArgsCount() != 0)
+                    throw new ParserException("Function "+funcFactory.getName()+" expected 0 args, got "+funcFactory.getArgsCount());
                 return funcFactory.createNew();
             }
             Node h = H();
@@ -204,10 +205,14 @@ public class Parser {
                 match(lookAhead);
                 Node h2 = H();
                 match(closeGroup);
+                if(funcFactory.getArgsCount() != 2)
+                    throw new ParserException("Function "+funcFactory.getName()+" expected 2 args, got "+funcFactory.getArgsCount());
                 return funcFactory.createNew(h, h2);
             }
             // FUNCTION ( H )
             match(closeGroup);
+            if(funcFactory.getArgsCount() != 1)
+                throw new ParserException("Function "+funcFactory.getName()+" expected 1 args, got "+funcFactory.getArgsCount());
             return funcFactory.createNew(h);
         }
         // CONSTANT or VAR

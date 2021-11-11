@@ -5,8 +5,15 @@ import eval.tree.NodeFactory;
 
 public class FuncFactory extends NodeFactory {
 
-    public FuncFactory(String name) {
+    private int argsCount;
+
+    public int getArgsCount(){
+        return argsCount;
+    }
+
+    public FuncFactory(String name, int argsCount) {
         super(name);
+        this.argsCount = argsCount;
     }
 
     @Override
