@@ -99,7 +99,6 @@ public class Main extends JFrame {
 
         // TODO: provide functionality
         // ----------------------------- MENU BAR --------------------------------
-
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
@@ -139,8 +138,16 @@ public class Main extends JFrame {
         menuBar.add(viewMenu);
         JCheckBoxMenuItem fpsItem = new JCheckBoxMenuItem("Show FPS");
         fpsItem.setSelected(true);
+        fpsItem.addActionListener(e -> {
+            graph2DPanel.setShowFps(fpsItem.isSelected());
+            treePanel.setShowFps(fpsItem.isSelected());
+        });
         viewMenu.add(fpsItem);
         JCheckBoxMenuItem controlItem = new JCheckBoxMenuItem("Show controls");
+        controlItem.addActionListener(e->{
+            graphControlScroller.setVisible(controlItem.isSelected());
+            treeControlScroller.setVisible(controlItem.isSelected());
+        });
         controlItem.setSelected(true);
         viewMenu.add(controlItem);
 
@@ -151,6 +158,7 @@ public class Main extends JFrame {
         helpMenu.add(aboutItem);
         JMenuItem manualItem = new JMenuItem("Manual");
         helpMenu.add(manualItem);
+
 
 
         pack();
