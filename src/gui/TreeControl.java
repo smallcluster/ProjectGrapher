@@ -1,6 +1,7 @@
 package gui;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class TreeControl extends JPanel {
     TreePanel treePanel;
@@ -8,17 +9,24 @@ public class TreeControl extends JPanel {
     public TreeControl(TreePanel treePanel){
         this.treePanel = treePanel;
 
-        JPanel container = new JPanel();
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-        add(container);
+        setLayout(new GridBagLayout());
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.anchor = GridBagConstraints.NORTH;
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 1;
 
-        JButton recenter = new JButton("Recenter");
-        container.add(recenter);
-        recenter.addActionListener(e -> treePanel.recenter());
 
         JButton reunfold = new JButton("Re-unfold");
-        container.add(reunfold);
+        add(reunfold, gc);
         reunfold.addActionListener(e -> treePanel.recrush());
+
+        JButton recenter = new JButton("Recenter view");
+        gc.gridy = 1;
+        gc.weighty = 1;
+        add(recenter, gc);
+        recenter.addActionListener(e -> treePanel.recenter());
+
+
 
 
     }

@@ -9,6 +9,10 @@ import eval.parsing.ParserException;
 import debug.DEBUG_MODE;
 
 public class Evaluator {
+
+    public static int OK = -1;
+    public static int EMPTY = -2;
+
     private Node exp;
     Parser parser;
     String input;
@@ -31,12 +35,12 @@ public class Evaluator {
         Reader reader = new StringReader(this.input);
         try {
             exp = parser.parse(reader);
-            return -1;
+            return exp == null ? EMPTY : OK; // empty is an invalid exp
         } catch (ParserException e) {
             exp = null;
             if(DEBUG_MODE.ENABLED)
                 e.printStackTrace();
-            return reader.getPos()-1;
+            return reader.getPos() > 0 ? reader.getPos()-1 : reader.getPos();
         }
     }
 

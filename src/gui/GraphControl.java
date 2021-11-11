@@ -7,39 +7,40 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class GraphControl extends JPanel {
-    Graph2DPanel graph2DPanel;
+    private Graph2DPanel graph2DPanel;
 
-    InputField xmin, xmax, ymin, ymax, step;
-    JCheckBox autoStep;
+    private InputField xmin, xmax, ymin, ymax, step;
+    private JCheckBox autoStep;
 
     public GraphControl(Graph2DPanel graph2DPanel) {
-
         setLayout(new GridBagLayout());
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.gridx = 0;
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 1;
+        gc.anchor = GridBagConstraints.NORTH;
 
         this.graph2DPanel = graph2DPanel;
 
         xmin = new InputField("x min", "-10");
-        add(0, xmin, 0);
+        add(xmin, 0, gc);
         xmax = new InputField("x max", "10");
-        add(1, xmax, 0);
+        add(xmax, 0, gc);
         ymin = new InputField("y min", "-5");
-        add(2, ymin, 0);
+        add(ymin, 0, gc);
         ymax = new InputField("y max", "5");
-        add(3, ymax, 0);
+        add(ymax, 0, gc);
         step = new InputField("step", "0.01");
-        add(4, step, 0);
+        add(step, 0, gc);
         autoStep = new JCheckBox("auto step");
         autoStep.setSelected(true);
-        add(5, autoStep, 0);
-        JButton colorChooser = new JButton("Set color");
-        add(6, colorChooser, 0);
+        add(autoStep, 0, gc);
         JButton recenter = new JButton("Recenter view");
-        add(7, recenter, 0);
+        add(recenter, 0, gc);
         JCheckBox showGrid = new JCheckBox("Show grid");
         showGrid.setSelected(true);
-        add(8, showGrid, 1);
+        add(showGrid, 1, gc);
 
-        colorChooser.addActionListener(e -> setGraphColor());
         recenter.addActionListener(e -> graph2DPanel.recenter());
         autoStep.addActionListener(e -> graph2DPanel.setAutoStep(autoStep.isSelected()));
         showGrid.addActionListener(e-> graph2DPanel.setShowGrid(showGrid.isSelected()));
@@ -97,20 +98,10 @@ public class GraphControl extends JPanel {
         graph2DPanel.setGraphControl(this);
     }
 
-    private void add(int y, Component c, int weight) {
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.gridx = 0;
-        gc.gridy = y;
-        gc.fill = GridBagConstraints.HORIZONTAL;
-        gc.weightx = 1;
+    private void add(Component c, int weight, GridBagConstraints gc) {
         gc.weighty = weight;
-        gc.anchor = GridBagConstraints.NORTH;
         add(c, gc);
-    }
-
-    private void setGraphColor(){
-        Color c = JColorChooser.showDialog(null, "Choose a color", Color.red);
-        graph2DPanel.setGraphColor(c);
+        gc.gridy++;
     }
 
     private float getFloatFromInput(InputField input) {
@@ -175,6 +166,4 @@ public class GraphControl extends JPanel {
         step.setInputText(Float.toString(val));
         step.clearError();
     }
-
-
 }

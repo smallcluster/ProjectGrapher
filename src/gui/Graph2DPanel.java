@@ -1,14 +1,23 @@
 package gui;
 
-import eval.Evaluator;
-
 import java.awt.*;
 import java.awt.event.*;
 
 public class Graph2DPanel extends Animated2DView implements MouseListener {
 
-    private Evaluator currentEval;
+    private final FunctionList functionList;
+    private Function currentFunction = null;
+
+    public Function getCurrentFunction() {
+        return currentFunction;
+    }
+
+    public void setCurrentFunction(Function currentFunction) {
+        this.currentFunction = currentFunction;
+    }
+
     private GraphControl graphControl = null;
+
 
     // Axis selection
     private boolean scalingAxisX = false;
@@ -17,13 +26,9 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     // ------------------ Controls -----------------------
     private float step = 0.01f;
     private boolean autoStep = true;
-    private Color graphColor = Color.red;
     private boolean showGrid = true;
 
     //  SETTERS
-    public void setGraphColor(Color c){
-        graphColor = c;
-    }
     public void setAutoStep(boolean b){
         autoStep = b;
         updateAutoStep();
@@ -59,10 +64,10 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         graphControl.setRegion(getWorldX(0), getWorldX(getWidth()), getWorldY(getHeight()), getWorldY(0));
     }
 
-    public Graph2DPanel(int w, int h, Evaluator evaluator) {
+    public Graph2DPanel(int w, int h, FunctionList functionList) {
         super();
+        this.functionList = functionList;
         setPreferredSize(new Dimension(w, h));
-        currentEval = evaluator;
 
         addMouseListener(this);
         // Detect resize change
@@ -85,10 +90,18 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         if(showGrid)
             drawGrid(g);
         drawAxes(g);
-        //Draw function
-        if (currentEval.isExpValid()){
-            drawFunction(g);
+        //Draw functions
+        for(Function f : functionList.getFunctions()){
+            if(!f.isVisible()) continue;
+            drawFunction(g, f);
         }
+
+        // Draw the function in the input bar
+        if( currentFunction != null){
+            drawFunction(g, currentFunction);
+            drawMouseCoords(g, currentFunction);
+        }
+
         // Draw fps
         drawFps(g);
     }
@@ -137,30 +150,37 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
             g.drawLine( 0, (int) getScreenY(y), getWidth(), (int) getScreenY(y));
     }
 
-    public void drawFunction(Graphics g) {
+    public void drawFunction(Graphics g, Function function) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        g2.setColor(graphColor);
+        g2.setColor(function.getColor());
         g2.setStroke(new BasicStroke(2));
 
         int height = getHeight();
         float endX = getWorldX(getWidth());
 
         for (float x = getWorldX(0); x < endX; x += step) {
-            float y = getScreenY(currentEval.eval(x, time));
-            float yy = getScreenY(currentEval.eval(x + step, time));
+            float y = getScreenY(function.eval(x, time));
+            float yy = getScreenY(function.eval(x + step, time));
 
             // draw line only if visible
             if ((y > 0 && y < height) || (yy > 0 && yy < height))
                 g2.drawLine((int) getScreenX(x), (int) y, (int) getScreenX(x + step), (int) yy);
         }
 
+        g2.dispose();
+    }
+
+    public void drawMouseCoords(Graphics g, Function function){
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
         // draw mouse coords
         g2.setColor(Color.BLUE);
         g2.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
-        float y = currentEval.eval(getWorldX(prevMouseX), time);
+        float y = function.eval(getWorldX(prevMouseX), time);
         // draw only the visible part of the line
         // because we can have freezes when drawing to infinity...
         float sy = getScreenY(y);
@@ -174,6 +194,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         g2.drawString("(" + getWorldX(prevMouseX) + ", " + y + ")", (int) prevMouseX + 32, (int) prevMouseY + 32);
 
         g2.dispose();
+
     }
 
     public float clamp(float val, float min, float max) {
@@ -270,4 +291,5 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     public void setShowGrid(boolean selected) {
         showGrid = selected;
     }
+
 }
