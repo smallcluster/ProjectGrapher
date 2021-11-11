@@ -4,6 +4,7 @@ import gui.TreePanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 
 
 // 1h30
@@ -126,6 +127,12 @@ public class Main extends JFrame {
         fileMenu.add(saveFileAsItem);
         JMenuItem openFileItem = new JMenuItem("Open File...");
         fileMenu.add(openFileItem);
+        fileMenu.add(new JSeparator());
+        JMenuItem quitItem = new JMenuItem("Quit");
+        fileMenu.add(quitItem);
+        quitItem.addActionListener(e->{
+            dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+        });
 
         // Edit menu
         JMenu editMenu = new JMenu("Edit");
