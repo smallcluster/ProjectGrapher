@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 
 public class FuncInputField extends JPanel {
 
-    private Evaluator evaluator;
+    private final Evaluator evaluator;
     private final JTextField inputField;
     private final JTextField funcName;
     private final JLabel errorLog;
@@ -21,13 +21,11 @@ public class FuncInputField extends JPanel {
     private final JButton colorButton;
 
     private final JButton saveButton;
-    private FunctionList functionList;
 
     public FuncInputField(Graph2DPanel graph2DPanel, Evaluator evaluator, String expText, TreePanel treePanel, FunctionList functionList){
         this.evaluator = evaluator;
         this.graph2DPanel = graph2DPanel;
         this.treePanel = treePanel;
-        this.functionList = functionList;
 
         setLayout(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
@@ -146,7 +144,8 @@ public class FuncInputField extends JPanel {
         });
 
         colorButton.addActionListener(e->{
-            color = JColorChooser.showDialog(null, "Choose a color", color);
+            color = JColorChooser.showDialog(getRootPane(), "Choose a color", color);
+            color = new Color(color.getRed(), color.getGreen(), color.getBlue());
             colorButton.setBackground(color);
             Function f = graph2DPanel.getCurrentFunction();
             if(f != null){
@@ -182,6 +181,14 @@ public class FuncInputField extends JPanel {
 
         // Called on button "eval" press
         evalButton.addActionListener(evalAction);
+    }
+
+    public String getText(){
+        return inputField.getText();
+    }
+
+    public Color getColor(){
+        return color;
     }
 
 
@@ -238,6 +245,26 @@ public class FuncInputField extends JPanel {
         colorButton.setBackground(color);
         inputField.setText(f.getExp());
         funcName.setText(f.getName());
+        evalFunction();
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+        colorButton.setBackground(color);
+        evalFunction();
+    }
+
+    public String getFunctionName(){
+        return funcName.getText();
+    }
+
+    public void setFunctionName(String name){
+        funcName.setText(name);
+        evalFunction();
+    }
+
+    public void setFunctionExp(String exp) {
+        inputField.setText(exp);
         evalFunction();
     }
 }

@@ -28,6 +28,14 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     private boolean autoStep = true;
     private boolean showGrid = true;
 
+    public boolean isAutoStep(){
+        return autoStep;
+    }
+
+    public float getStep(){
+        return step;
+    }
+
     //  SETTERS
     public void setAutoStep(boolean b){
         autoStep = b;
@@ -85,7 +93,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
     public void paint(Graphics g) {
         super.paint(g);
         // background
-        g.setColor(Color.white);
+        g.setColor(bgColor);
         g.fillRect(0, 0, getWidth(), getHeight());
         if(showGrid)
             drawGrid(g);
@@ -93,6 +101,9 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         //Draw functions
         for(Function f : functionList.getFunctions()){
             if(!f.isVisible()) continue;
+            if(currentFunction != null)
+                if(f.getName().equals(currentFunction.getName()))
+                    continue;
             drawFunction(g, f);
         }
 
@@ -152,7 +163,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
 
     public void drawFunction(Graphics g, Function function) {
         Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
 
         g2.setColor(function.getColor());
         g2.setStroke(new BasicStroke(2));
@@ -178,7 +189,7 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
         // draw mouse coords
-        g2.setColor(Color.BLUE);
+        g2.setColor(Color.BLACK);
         g2.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
         float y = function.eval(getWorldX(prevMouseX), time);
         // draw only the visible part of the line
@@ -191,6 +202,8 @@ public class Graph2DPanel extends Animated2DView implements MouseListener {
         g2.drawLine((int) prevMouseX, (int) clamp(getScreenY(0), 0, getHeight()),
                 (int) prevMouseX, (int) clamp(sy, 0, getHeight()));
 
+        Font font = new Font("TimesRoman", Font.PLAIN, 18);
+        g2.setFont(font);
         g2.drawString("(" + getWorldX(prevMouseX) + ", " + y + ")", (int) prevMouseX + 32, (int) prevMouseY + 32);
 
         g2.dispose();

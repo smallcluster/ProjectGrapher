@@ -7,19 +7,14 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class GraphControl extends JPanel {
-    private Graph2DPanel graph2DPanel;
+    private final Graph2DPanel graph2DPanel;
 
     private final InputField xmin, xmax, ymin, ymax, step;
     private final JCheckBox autoStep;
-    private final JCheckBox showGrid;
 
     public void setAutoStep(boolean b){
         autoStep.setSelected(b);
         graph2DPanel.setAutoStep(b);
-    }
-    public void setShowGrid(boolean b){
-        showGrid.setSelected(b);
-        graph2DPanel.setShowGrid(b);
     }
 
     public GraphControl(Graph2DPanel graph2DPanel) {
@@ -32,28 +27,26 @@ public class GraphControl extends JPanel {
 
         this.graph2DPanel = graph2DPanel;
 
+        gc.weighty = 0;
+        gc.gridy = GridBagConstraints.RELATIVE;
         xmin = new InputField("x min", "-10");
-        add(xmin, 0, gc);
+        add(xmin, gc);
         xmax = new InputField("x max", "10");
-        add(xmax, 0, gc);
+        add(xmax, gc);
         ymin = new InputField("y min", "-5");
-        add(ymin, 0, gc);
+        add(ymin, gc);
         ymax = new InputField("y max", "5");
-        add(ymax, 0, gc);
+        add(ymax, gc);
         step = new InputField("step", "0.01");
-        add(step, 0, gc);
+        add(step, gc);
         autoStep = new JCheckBox("auto step");
         autoStep.setSelected(true);
-        add(autoStep, 0, gc);
+        add(autoStep, gc);
         JButton recenter = new JButton("Recenter view");
-        add(recenter, 0, gc);
-        showGrid = new JCheckBox("Show grid");
-        showGrid.setSelected(true);
-        add(showGrid, 1, gc);
+        add(recenter, gc);
 
         recenter.addActionListener(e -> graph2DPanel.recenter());
         autoStep.addActionListener(e -> graph2DPanel.setAutoStep(autoStep.isSelected()));
-        showGrid.addActionListener(e-> graph2DPanel.setShowGrid(showGrid.isSelected()));
 
 
         step.addDocumentListener(new DocumentListener() {
@@ -106,12 +99,6 @@ public class GraphControl extends JPanel {
 
 
         graph2DPanel.setGraphControl(this);
-    }
-
-    private void add(Component c, int weight, GridBagConstraints gc) {
-        gc.weighty = weight;
-        add(c, gc);
-        gc.gridy++;
     }
 
     private float getFloatFromInput(InputField input) {

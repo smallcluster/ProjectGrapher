@@ -15,10 +15,16 @@ public class UnaryFunc extends UnaryNode {
         switch (name){
             case "sin":
                 return (float) Math.sin(getChild().eval(x, time));
+            case "asin":
+                return (float) Math.asin(getChild().eval(x, time));
             case "cos":
                 return (float) Math.cos(getChild().eval(x, time));
+            case "acos":
+                return (float) Math.acos(getChild().eval(x, time));
             case "tan":
                 return (float) Math.tan(getChild().eval(x, time));
+            case "atan":
+                return (float) Math.atan(getChild().eval(x, time));
             case "exp":
                 return (float) Math.exp(getChild().eval(x, time));
             case "ln":

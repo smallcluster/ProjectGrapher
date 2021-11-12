@@ -36,7 +36,8 @@ class FunctionControls extends JPanel {
         gc.gridx = 1;
         add(color, gc);
         color.addActionListener(e -> {
-            Color c = JColorChooser.showDialog(null, "Choose a color", function.getColor());
+            Color c = JColorChooser.showDialog(getRootPane(), "Choose a color", function.getColor());
+            c = new Color(c.getRed(), c.getGreen(), c.getBlue());
             function.setColor(c);
             color.setBackground(c);
         });

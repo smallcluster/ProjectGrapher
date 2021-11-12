@@ -18,7 +18,7 @@ class SymbTable {
 
         // CTE
         addEntry(Token.Type.CONSTANT, "e", new ConstFactory("e", 2.71828182846f));
-        addEntry(Token.Type.CONSTANT, "PI", new ConstFactory("e", 3.14159265359f));
+        addEntry(Token.Type.CONSTANT, "PI", new ConstFactory("PI", 3.14159265359f));
 
         // VARIABLES
         addEntry(Token.Type.VARIABLE, "x", new VarFactory("x"));
@@ -28,6 +28,9 @@ class SymbTable {
         addEntry(Token.Type.FUNCTION, "sin", new FuncFactory("sin", 1));
         addEntry(Token.Type.FUNCTION, "cos", new FuncFactory("cos", 1));
         addEntry(Token.Type.FUNCTION, "tan", new FuncFactory("tan", 1));
+        addEntry(Token.Type.FUNCTION, "asin", new FuncFactory("asin", 1));
+        addEntry(Token.Type.FUNCTION, "acos", new FuncFactory("acos", 1));
+        addEntry(Token.Type.FUNCTION, "atan", new FuncFactory("atan", 1));
         addEntry(Token.Type.FUNCTION, "sqrt", new FuncFactory("sqrt", 1));
         addEntry(Token.Type.FUNCTION, "abs", new FuncFactory("abs", 1));
         addEntry(Token.Type.FUNCTION, "ln", new FuncFactory("ln", 1));
@@ -71,11 +74,11 @@ class SymbTable {
 
     @Override
     public String toString() {
-        String txt = "{\n";
+        StringBuilder txt = new StringBuilder("{\n");
         for (Entry t: entries) {
-            txt+=t+",\n";
+            txt.append(t).append(",\n");
         }
-        txt+="}";
-        return txt;
+        txt.append("}");
+        return txt.toString();
     }
 }

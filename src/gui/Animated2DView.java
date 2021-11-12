@@ -20,8 +20,26 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
 
     private float pixelsPerUnitX = 64.0f;
     private float pixelsPerUnitY = 64.0f;
+    protected Color bgColor = Color.white;
+    protected boolean antialiasing = false;
+
+    public void setAntialiasing(boolean antialias) {
+        antialiasing = antialias;
+
+    }
+
+    public Color getBgColor() {
+        return bgColor;
+    }
+
+    public void setBgColor(Color bgColor) {
+        this.bgColor = bgColor;
+    }
 
     protected int frameCap = 60;
+    public void setFrameCap(int frameCap){
+        this.frameCap = frameCap;
+    }
     protected boolean showFps = true;
 
 
@@ -50,9 +68,7 @@ public abstract class Animated2DView extends JPanel implements MouseMotionListen
                 // Do stuff synchronously
                 try {
                     invokeAndWait(actions);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
+                } catch (InterruptedException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
                 // sleep

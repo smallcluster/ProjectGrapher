@@ -138,7 +138,7 @@ public class TreePanel extends Animated2DView implements MouseListener {
     public void paint(Graphics g) {
         super.paint(g);
 
-        g.setColor(Color.white);
+        g.setColor(bgColor);
         g.fillRect(0, 0, getWidth(), getHeight());
 
         // Axes
@@ -160,6 +160,8 @@ public class TreePanel extends Animated2DView implements MouseListener {
 
     private void drawParticles(Graphics g) {
         boolean possibleSelection = false;
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
         for (Particle p : particles) {
 
             // do not draw particle if not visible
@@ -167,12 +169,12 @@ public class TreePanel extends Animated2DView implements MouseListener {
                 continue;
 
             if (p.isRoot())
-                g.setColor(Color.red);
+                g2.setColor(Color.red);
             else if (p.isFixed())
-                g.setColor(Color.blue);
+                g2.setColor(Color.blue);
             else
-                g.setColor(Color.black);
-            g.fillOval((int) (getScreenX(p.x) - p.r * getPixelsPerUnitX()),
+                g2.setColor(Color.black);
+            g2.fillOval((int) (getScreenX(p.x) - p.r * getPixelsPerUnitX()),
                     (int) (getScreenY(p.y) - p.r * getPixelsPerUnitX()),
                     (int) (p.r * 2 * getPixelsPerUnitX()),
                     (int) (p.r * 2 * getPixelsPerUnitX()));
@@ -194,6 +196,8 @@ public class TreePanel extends Animated2DView implements MouseListener {
             setCursor(handCursor);
         else
             setCursor(arrowCursor);
+
+        g2.dispose();
     }
 
     private boolean particleNotVisible(Particle p) {
@@ -202,6 +206,8 @@ public class TreePanel extends Animated2DView implements MouseListener {
     }
 
     private void drawLinks(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
         for (Link li : links) {
 
             // do not draw link if not visible
@@ -211,22 +217,26 @@ public class TreePanel extends Animated2DView implements MouseListener {
             String info = "";
             switch (li.getType()) {
                 case NORMAL:
+                    g2.setColor(Color.black);
                     g.setColor(Color.black);
                     break;
                 case COND:
+                    g2.setColor(Color.blue);
                     g.setColor(Color.blue);
                     info = "COND";
                     break;
                 case TRUE:
+                    g2.setColor(Color.green);
                     g.setColor(Color.green);
                     info = "TRUE";
                     break;
                 case FALSE:
+                    g2.setColor(Color.red);
                     g.setColor(Color.red);
                     info = "FALSE";
                     break;
             }
-            g.drawLine((int) getScreenX(li.getP1().x), (int) getScreenY(li.getP1().y), (int) getScreenX(li.getP2().x), (int) getScreenY(li.getP2().y));
+            g2.drawLine((int) getScreenX(li.getP1().x), (int) getScreenY(li.getP1().y), (int) getScreenX(li.getP2().x), (int) getScreenY(li.getP2().y));
 
             if (!info.isEmpty()) {
                 Font font = new Font("TimesRoman", Font.PLAIN, (int) (0.375 * getPixelsPerUnitX()));
@@ -239,6 +249,7 @@ public class TreePanel extends Animated2DView implements MouseListener {
                 g.drawString(info, (int) (getScreenX(x) - tw / 2.0), (int) (getScreenY(y) + th / 2.0));
             }
         }
+        g2.dispose();
     }
 
     @Override
