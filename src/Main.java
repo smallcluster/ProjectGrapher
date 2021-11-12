@@ -348,6 +348,7 @@ public class Main extends JFrame {
                     path = f.getAbsolutePath();
                     if (!path.endsWith(".ini")) path += ".ini";
                     save(path);
+
                 } else
                     save(path);
             }
@@ -360,7 +361,7 @@ public class Main extends JFrame {
             graph2DPanel.setShowGrid(true);
             functionList.clear();
             funcInputField.setFunction(new Function("F", null, "", Color.red));
-
+            path = "";
         });
 
         // Help menu
