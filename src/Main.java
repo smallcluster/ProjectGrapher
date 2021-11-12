@@ -334,32 +334,32 @@ public class Main extends JFrame {
 
         newFileItem.addActionListener(e -> {
             int ask = JOptionPane.showConfirmDialog(getRootPane(), "Save on creating new file ?", "New File", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if(ask != JOptionPane.YES_OPTION && ask != JOptionPane.NO_OPTION) return;
+
             if (ask == JOptionPane.YES_OPTION) {
+
                 if (path.isEmpty()) {
                     JFileChooser fc = new JFileChooser();
                     fc.setDialogTitle("Choose a file");
                     fc.setFileFilter(new FileNameExtensionFilter("config", "ini"));
                     int result = fc.showSaveDialog(getRootPane());
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        File f = fc.getSelectedFile();
-                        path = f.getAbsolutePath();
-                        if (!path.endsWith(".ini")) path += ".ini";
-                        save(path);
-                    }
-                } else {
+                    if(result != JFileChooser.APPROVE_OPTION) return;
+                    File f = fc.getSelectedFile();
+                    path = f.getAbsolutePath();
+                    if (!path.endsWith(".ini")) path += ".ini";
                     save(path);
-                }
-            } else if(ask == JOptionPane.NO_OPTION){
-                graph2DPanel.setPixelsPerUnitX(64.0f);
-                graph2DPanel.setPixelsPerUnitY(64.0f);
-                graph2DPanel.setOffsetX(0);
-                graph2DPanel.setOffsetY(0);
-                graphControl.setAutoStep(true);
-                gridItem.setSelected(true);
-                graph2DPanel.setShowGrid(true);
-                functionList.clear();
-                funcInputField.setFunction(new Function("F", null, "", Color.red));
+                } else
+                    save(path);
             }
+            graph2DPanel.setPixelsPerUnitX(64.0f);
+            graph2DPanel.setPixelsPerUnitY(64.0f);
+            graph2DPanel.setOffsetX(0);
+            graph2DPanel.setOffsetY(0);
+            graphControl.setAutoStep(true);
+            gridItem.setSelected(true);
+            graph2DPanel.setShowGrid(true);
+            functionList.clear();
+            funcInputField.setFunction(new Function("F", null, "", Color.red));
 
         });
 
