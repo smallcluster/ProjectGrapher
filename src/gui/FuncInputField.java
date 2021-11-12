@@ -161,10 +161,23 @@ public class FuncInputField extends JPanel {
                 funcName.setBackground(Color.red);
                 return;
             }
+            // Ask user to override function if they have the same name
             funcName.setBackground(Color.white);
-            functionList.add(new Function(name,  evaluator.getExpTree(), evaluator.getInput(), color));
-            inputField.setText("");
-            evalFunction();
+            Function f = new Function(name,  evaluator.getExpTree(), evaluator.getInput(), color);
+
+            int i = functionList.findFunction(f);
+            if( i != -1){
+                int ask = JOptionPane.showConfirmDialog(getRootPane(), "Function \""+f.getName()+"\" already exist, override it ?", "Override function", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(ask == JOptionPane.YES_OPTION){
+                    functionList.setFunctionAt(i, f);
+                    inputField.setText("");
+                    evalFunction();
+                }
+            } else {
+                functionList.add(f);
+                inputField.setText("");
+                evalFunction();
+            }
         });
 
         // Called on button "eval" press

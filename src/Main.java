@@ -143,14 +143,14 @@ public class Main extends JFrame {
         // View menu
         JMenu viewMenu = new JMenu("View");
         menuBar.add(viewMenu);
-        JCheckBoxMenuItem fpsItem = new JCheckBoxMenuItem("Show FPS");
+        JCheckBoxMenuItem fpsItem = new JCheckBoxMenuItem("Display FPS");
         fpsItem.setSelected(true);
         fpsItem.addActionListener(e -> {
             graph2DPanel.setShowFps(fpsItem.isSelected());
             treePanel.setShowFps(fpsItem.isSelected());
         });
         viewMenu.add(fpsItem);
-        JCheckBoxMenuItem controlItem = new JCheckBoxMenuItem("Show controls");
+        JCheckBoxMenuItem controlItem = new JCheckBoxMenuItem("Display Controls");
         controlItem.addActionListener(e->{
             graphControlScroller.setVisible(controlItem.isSelected());
             treeControlScroller.setVisible(controlItem.isSelected());
