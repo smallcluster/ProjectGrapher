@@ -21,7 +21,7 @@ public class About extends JDialog {
         gc.insets = new Insets(10, 10, 10, 10);
 
         Font fontName = new Font("Arial", Font.BOLD, 32);
-        JLabel name = new JLabel("Project Grapher v1.5", JLabel.CENTER);
+        JLabel name = new JLabel("Project Grapher v1.5.0", JLabel.CENTER);
         name.setFont(fontName);
         gc.gridwidth = 2;
         add(name, gc);
