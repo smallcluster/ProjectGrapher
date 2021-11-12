@@ -40,7 +40,7 @@ class Settings extends JDialog {
         gc.weightx = 1;
         fpsCap = new JSlider();
         fpsCap.setMinimum(5);
-        fpsCap.setMaximum(120);
+        fpsCap.setMaximum(144);
         fpsCap.setValue(fps);
         add(fpsCap, gc);
         fpsCap.addChangeListener(e-> fpsCapLabel.setText("FPS cap: "+fpsCap.getValue()));
@@ -209,7 +209,7 @@ public class Main extends JFrame {
 
 
         // ------------------ FUNC INPUT --------------------------------
-        String input = "exp((sin(cos(x+TIME )^3)+sin(10*x)*0.1+sin(x/4)*2+cos(10+25*x)*0.05)*( |x| % 4 < 2  ? sin(-TIME)/2 : cos(TIME)/2))";
+        String input = "";
         // Current evaluated function input and error info
         funcInputField = new FuncInputField(graph2DPanel, evaluator, input, treePanel, functionList);
         add(funcInputField, BorderLayout.SOUTH);

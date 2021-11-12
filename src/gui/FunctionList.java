@@ -98,8 +98,9 @@ public class FunctionList extends JPanel {
         gc.anchor = GridBagConstraints.NORTH;
         gc.gridy = GridBagConstraints.RELATIVE;
         gc.insets = new Insets(5, 0, 0, 0);
-        add(new Function("sin", new UnaryFunc("sin", new Var("x")), "sin(x)", Color.GREEN));
-        add(new Function("cos", new UnaryFunc("cos", new Var("x")), "cos(x)", Color.blue));
+        // testing only
+        //add(new Function("sin", new UnaryFunc("sin", new Var("x")), "sin(x)", Color.GREEN));
+        //add(new Function("cos", new UnaryFunc("cos", new Var("x")), "cos(x)", Color.blue));
     }
 
     public int findFunction(Function f) {
