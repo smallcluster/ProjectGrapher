@@ -8,6 +8,8 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+import static javax.swing.SwingUtilities.invokeLater;
+
 public class FuncInputField extends JPanel {
 
     private final Evaluator evaluator;
@@ -101,45 +103,22 @@ public class FuncInputField extends JPanel {
             }
         });
 
+        funcName.addActionListener(e-> updateFunctionName());
+
         funcName.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                String name = funcName.getText().trim();
-
-                if(name.isEmpty()){
-                    funcName.setBackground(Color.red);
-                    saveButton.setVisible(false);
-                    return;
-                }
-                funcName.setBackground(Color.white);
-
-                evalFunction();
+                updateFunctionName();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                String name = funcName.getText().trim();
-
-                if(name.isEmpty()){
-                    funcName.setBackground(Color.red);
-                    saveButton.setVisible(false);
-                    return;
-                }
-                funcName.setBackground(Color.white);
-                evalFunction();
+                updateFunctionName();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                String name = funcName.getText().trim();
-
-                if(name.isEmpty()){
-                    funcName.setBackground(Color.red);
-                    saveButton.setVisible(false);
-                    return;
-                }
-                funcName.setBackground(Color.white);
-                evalFunction();
+                updateFunctionName();
             }
         });
 
@@ -189,6 +168,22 @@ public class FuncInputField extends JPanel {
 
     public Color getColor(){
         return color;
+    }
+
+    public void updateFunctionName(){
+        invokeLater(()->{
+            String oldName = funcName.getText();
+            String name = funcName.getText().replace(' ', '_');
+            if(!name.equals(oldName))
+                funcName.setText(name);
+            if(name.isEmpty()){
+                funcName.setBackground(Color.red);
+                saveButton.setVisible(false);
+                return;
+            }
+            funcName.setBackground(Color.white);
+            evalFunction();
+        });
     }
 
 
@@ -259,7 +254,7 @@ public class FuncInputField extends JPanel {
     }
 
     public void setFunctionName(String name){
-        funcName.setText(name);
+        funcName.setText(name.trim().replace(' ', '_'));
         evalFunction();
     }
 

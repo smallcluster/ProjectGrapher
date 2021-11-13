@@ -13,7 +13,7 @@ public class Function {
     }
 
     public void setExp(String exp) {
-        this.exp = exp;
+        this.exp = exp.replaceAll(" ", "");
     }
 
     private Node function;
@@ -55,7 +55,7 @@ public class Function {
         this.function = function;
         this.color = color;
         visible = true;
-        this.exp = exp;
+        this.exp = exp.replaceAll(" ", "");
     }
 
     public float eval(float x, float time){

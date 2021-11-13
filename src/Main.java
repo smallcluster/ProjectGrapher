@@ -265,7 +265,14 @@ public class Main extends JFrame {
         saveFileAsItem.setAccelerator(ctrlA);
 
         saveFileAsItem.addActionListener(e -> {
-            JFileChooser fc = new JFileChooser();
+
+            JFileChooser fc;
+            File temp = new File(path);
+            if(path.isEmpty() || !temp.exists())
+                fc = new JFileChooser();
+            else
+                fc = new JFileChooser(path);
+
             fc.setDialogTitle("Choose a file");
             fc.setFileFilter(new FileNameExtensionFilter("config", "ini"));
             int result = fc.showSaveDialog(getRootPane());
@@ -284,7 +291,13 @@ public class Main extends JFrame {
         openFileItem.setAccelerator(ctrlO);
 
         openFileItem.addActionListener(e -> {
-            JFileChooser fc = new JFileChooser();
+            JFileChooser fc;
+            File temp = new File(path);
+            if(path.isEmpty() || !temp.exists())
+                fc = new JFileChooser();
+            else
+                fc = new JFileChooser(path);
+
             fc.setDialogTitle("Choose a file");
             fc.setFileFilter(new FileNameExtensionFilter("config", "ini"));
             int result = fc.showSaveDialog(getRootPane());
@@ -449,7 +462,7 @@ public class Main extends JFrame {
             String inputFuncName = funcInputField.getFunctionName().trim();
             printWriter.println("\n[inputField]");
             printWriter.println(String.format(Locale.US, "name=%s", inputFuncName.isEmpty() ? "F" : inputFuncName));
-            printWriter.println(String.format(Locale.US, "exp=%s", funcInputField.getText().trim()));
+            printWriter.println(String.format(Locale.US, "exp=%s", funcInputField.getText().replaceAll(" ", "")));
             Color inputColor = funcInputField.getColor();
             printWriter.println(String.format(Locale.US, "color=%s", String.format("#%02X%02X%02X", inputColor.getRed(), inputColor.getGreen(), inputColor.getBlue())));
 

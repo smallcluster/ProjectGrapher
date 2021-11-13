@@ -26,12 +26,12 @@ public class Evaluator {
     public Evaluator(String input){
         parser = new Parser();
         this.exp = null;
-        this.input = input;
+        this.input = input.replaceAll(" ", "");
         parse(this.input);
     }
 
     public int parse(String input) {
-        this.input = input;
+        this.input = input.replaceAll(" ", "");
         Reader reader = new StringReader(this.input);
         try {
             exp = parser.parse(reader);
