@@ -347,10 +347,9 @@ public class Main extends JFrame {
                     File f = fc.getSelectedFile();
                     path = f.getAbsolutePath();
                     if (!path.endsWith(".ini")) path += ".ini";
-                    save(path);
 
-                } else
-                    save(path);
+                }
+                save(path);
             }
             graph2DPanel.setPixelsPerUnitX(64.0f);
             graph2DPanel.setPixelsPerUnitY(64.0f);
